@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vibe Coding the Pro Way — June 10 Meetup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --primary:#2BB8C4; --primary-dark:#229BA5; --primary-light:#A8F0F4;
+    --secondary:#E07850; --success:#7BC47F; --warning:#E0C878; --danger:#D85858;
+    --bg-dark:#1A2E3B; --bg-darker:#142430; --text-light:#FFF5EB; --text-muted:#6B8A99;
+    --border:#2D4A5A; --code-bg:#142430;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Figtree',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg-darker);color:var(--text-light);overflow:hidden;height:100vh;}
+  .presentation{height:100vh;width:100vw;position:relative;}
+  .slide{display:none;height:100vh;width:100vw;padding:60px 90px 92px;background:linear-gradient(135deg,var(--bg-darker) 0%,var(--bg-dark) 100%);overflow-y:auto;}
+  .slide.active{display:flex;flex-direction:column;}
+  [data-speaker-note]{display:none;}
+  .slide-header{margin-bottom:28px;}
+  .slide-title{font-size:2.5rem;font-weight:700;background:linear-gradient(135deg,var(--primary-light) 0%,var(--primary) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px;line-height:1.1;}
+  .slide-subtitle{font-size:1.2rem;color:var(--text-muted);}
+  .slide-content{flex:1;display:flex;flex-direction:column;gap:20px;font-size:1.32rem;line-height:1.5;}
+  .slide-content ul{padding-left:26px;display:flex;flex-direction:column;gap:12px;}
+  .slide-content li::marker{color:var(--primary);}
+  .lead{font-size:1.65rem;color:var(--text-light);}
+  .muted{color:var(--text-muted);}
+  .pill{display:inline-block;background:var(--bg-dark);border:1px solid var(--border);border-radius:999px;padding:4px 14px;font-size:1rem;color:var(--primary-light);font-family:'IBM Plex Mono',monospace;}
+  .accent{color:var(--primary-light);font-weight:600;}
+  .coral{color:var(--secondary);font-weight:600;}
+  code,.mono{font-family:'IBM Plex Mono',monospace;background:var(--code-bg);border:1px solid var(--border);border-radius:6px;padding:2px 8px;color:var(--primary-light);font-size:.92em;}
+  .cards{display:flex;gap:18px;flex-wrap:wrap;}
+  .card{flex:1;min-width:220px;background:var(--bg-dark);border:1px solid var(--border);border-radius:14px;padding:20px 22px;}
+  .card h3{color:var(--primary-light);font-size:1.2rem;margin-bottom:8px;}
+  .card p{font-size:1.05rem;color:var(--text-light);}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:24px;}
+  .zone{border-radius:14px;padding:22px 24px;border:1px solid var(--border);}
+  .zone.smart{background:rgba(123,196,127,.12);border-color:var(--success);}
+  .zone.dumb{background:rgba(216,88,88,.12);border-color:var(--danger);}
+  .zone h3{font-size:1.3rem;margin-bottom:10px;}
+  .zone.smart h3{color:var(--success);} .zone.dumb h3{color:var(--danger);}
+  .flow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-family:'IBM Plex Mono',monospace;font-size:1.05rem;}
+  .flow .step{background:var(--bg-dark);border:1px solid var(--border);border-radius:10px;padding:9px 14px;}
+  .flow .step.human{border-color:var(--primary);color:var(--primary-light);}
+  .flow .step.afk{border-color:var(--secondary);color:var(--secondary);}
+  .flow .arrow{color:var(--text-muted);}
+  /* live-action cue + get-it + skill explain boxes */
+  .cue{display:inline-flex;align-items:center;gap:9px;background:rgba(224,120,80,.15);border:1px solid var(--secondary);color:var(--secondary);border-radius:999px;padding:7px 18px;font-family:'IBM Plex Mono',monospace;font-size:1.02rem;font-weight:500;width:fit-content;}
+  .cue .dot{width:9px;height:9px;border-radius:50%;background:var(--secondary);display:inline-block;animation:pulse 1.6s infinite;}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+  .getit{background:var(--bg-dark);border:1px solid var(--primary);border-radius:14px;padding:18px 22px;display:flex;flex-direction:column;gap:6px;}
+  .getit .u{font-family:'IBM Plex Mono',monospace;color:var(--primary-light);font-size:1.3rem;}
+  .getit .h{color:var(--text-muted);font-size:1rem;}
+  .skillcmd{font-family:'IBM Plex Mono',monospace;color:var(--primary-light);background:var(--code-bg);border:1px solid var(--primary);border-radius:8px;padding:3px 12px;}
+  .explain{background:var(--bg-dark);border-left:3px solid var(--secondary);border-radius:0 10px 10px 0;padding:14px 20px;font-size:1.22rem;}
+  .explain .lbl{font-family:'IBM Plex Mono',monospace;color:var(--secondary);font-size:.78rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:5px;}
+  .step-tag{font-family:'IBM Plex Mono',monospace;color:var(--text-muted);font-size:.95rem;}
+  /* "what we're building" visuals */
+  .ba{display:grid;grid-template-columns:1fr auto 1fr;gap:18px;align-items:center;}
+  .ba .box{background:var(--bg-dark);border:1px solid var(--border);border-radius:14px;padding:20px 22px;}
+  .ba .box.bad{border-color:var(--danger);} .ba .box.good{border-color:var(--success);}
+  .ba .box h3{font-size:1.2rem;margin-bottom:8px;}
+  .ba .box.bad h3{color:var(--danger);} .ba .box.good h3{color:var(--success);}
+  .ba .box p{font-size:1.1rem;line-height:1.45;}
+  .ba .arrow-big{font-size:2rem;color:var(--text-muted);}
+  .persona{display:flex;gap:16px;}
+  .gloss{display:flex;flex-wrap:wrap;gap:10px;}
+  .gloss .g{background:var(--bg-dark);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font-size:1.05rem;}
+  .gloss .g b{color:var(--primary-light);font-family:'IBM Plex Mono',monospace;}
+  .steps{display:flex;flex-wrap:wrap;gap:10px;align-items:center;}
+  .steps .s{display:flex;align-items:center;gap:10px;background:var(--bg-dark);border:1px solid var(--border);border-radius:12px;padding:11px 15px;font-size:1.08rem;}
+  .steps .n{flex:none;width:28px;height:28px;border-radius:50%;background:var(--primary);color:var(--bg-darker);font-weight:700;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:.95rem;}
+  .steps .sa{color:var(--text-muted);font-size:1.3rem;}
+  .cols3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
+  .col{background:var(--bg-dark);border:1px solid var(--border);border-radius:14px;padding:16px 18px;}
+  .col h3{font-size:1.12rem;margin-bottom:10px;}
+  .col.must{border-color:var(--success);} .col.must h3{color:var(--success);}
+  .col.should{border-color:var(--warning);} .col.should h3{color:var(--warning);}
+  .col.wont{border-color:var(--danger);} .col.wont h3{color:var(--danger);}
+  .col ul{padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:1rem;}
+  .col li{line-height:1.3;}
+  .constraints{font-size:1.02rem;color:var(--text-muted);background:var(--bg-dark);border:1px solid var(--border);border-radius:10px;padding:12px 16px;line-height:1.45;}
+  .constraints b{color:var(--primary-light);}
+  .pieces{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .piece{background:var(--bg-dark);border:1px solid var(--border);border-radius:14px;padding:14px 18px;position:relative;display:flex;align-items:baseline;gap:14px;}
+  .piece .pn{font-family:'IBM Plex Mono',monospace;color:var(--primary);font-size:1.5rem;font-weight:700;flex:none;}
+  .piece h3{color:var(--primary-light);font-size:1.15rem;margin-bottom:3px;}
+  .piece p{font-size:.98rem;color:var(--text-light);line-height:1.35;}
+  .piece.first{border-color:var(--secondary);}
+  .piece .tag{position:absolute;top:-10px;right:14px;font-family:'IBM Plex Mono',monospace;font-size:.78rem;color:var(--bg-darker);background:var(--secondary);border-radius:999px;padding:2px 10px;}
+  /* behind-the-scenes + run-it + badges */
+  .pitch-why{background:rgba(123,196,127,.10);border:1px solid var(--success);border-radius:12px;padding:16px 20px;font-size:1.25rem;line-height:1.45;}
+  .pitch-why b{color:var(--success);}
+  .howlittle{display:flex;flex-wrap:wrap;gap:10px;font-size:1.05rem;}
+  .howlittle .x{background:var(--bg-dark);border:1px solid var(--border);border-radius:999px;padding:7px 15px;}
+  .didgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .did{background:var(--bg-dark);border:1px solid var(--border);border-radius:12px;padding:12px 16px;font-size:1rem;line-height:1.35;}
+  .did b{color:var(--primary-light);}
+  .did .why{color:var(--secondary);}
+  .openbtn{display:inline-flex;align-items:center;gap:10px;background:var(--primary);color:var(--bg-darker);font-weight:700;font-size:1.3rem;padding:13px 26px;border-radius:12px;text-decoration:none;width:fit-content;}
+  .openbtn:hover{background:var(--primary-light);}
+  .phonebox{background:var(--bg-dark);border:1px solid var(--border);border-radius:14px;padding:16px 18px;display:flex;gap:22px;align-items:center;flex-wrap:wrap;}
+  .phonebox input{background:var(--code-bg);border:1px solid var(--border);border-radius:8px;color:var(--text-light);font-family:'IBM Plex Mono',monospace;padding:10px 12px;font-size:.92rem;width:340px;max-width:60vw;}
+  .phone-url{display:flex;flex-direction:column;justify-content:center;}
+  .qrtile{background:#fff;border-radius:12px;padding:10px;line-height:0;}
+  .label{color:var(--text-muted);font-size:1rem;}
+  .badges{display:flex;gap:34px;justify-content:center;flex-wrap:wrap;margin-top:4px;}
+  .badge-card{text-align:center;}
+  .badge-card .nm{margin-top:10px;font-size:1.12rem;color:var(--primary-light);font-weight:600;}
+  .badge-card .em{font-family:'IBM Plex Mono',monospace;color:var(--text-muted);font-size:.82rem;}
+  .tl{display:flex;flex-direction:column;gap:11px;}
+  .tl .row{display:flex;gap:14px;align-items:flex-start;}
+  .tl .mk{flex:none;width:26px;height:26px;border-radius:50%;background:var(--primary);color:var(--bg-darker);font-weight:700;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:.88rem;margin-top:2px;}
+  .tl .txt{font-size:1.06rem;line-height:1.4;}
+  .tl .txt b{color:var(--primary-light);}
+  .tl .ask{color:var(--secondary);}
+  /* live build board (stay-here checklist) */
+  .board{display:flex;flex-direction:column;gap:9px;}
+  .bp{display:flex;align-items:flex-start;gap:14px;background:var(--bg-dark);border:1px solid var(--border);border-radius:12px;padding:12px 16px;cursor:pointer;transition:border-color .15s,opacity .15s;}
+  .bp:hover{border-color:var(--primary-dark);}
+  .bp .box{flex:none;width:26px;height:26px;border-radius:7px;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:1rem;color:transparent;margin-top:1px;}
+  .bp .ttl{font-size:1.18rem;font-weight:600;color:var(--primary-light);}
+  .bp .dw{font-size:1rem;color:var(--text-muted);margin-top:2px;}
+  .bp .tag{display:none;margin-left:auto;align-self:center;font-family:'IBM Plex Mono',monospace;color:var(--secondary);font-size:.85rem;white-space:nowrap;}
+  .bp.next{border-color:var(--secondary);box-shadow:0 0 0 1px var(--secondary) inset;}
+  .bp.next .tag{display:block;}
+  .bp.done{opacity:.5;}
+  .bp.done .box{background:var(--success);border-color:var(--success);color:var(--bg-darker);}
+  .bp.done .ttl{text-decoration:line-through;color:var(--text-muted);}
+  .bref{display:flex;flex-direction:column;gap:5px;font-size:.98rem;color:var(--text-muted);background:var(--bg-dark);border:1px solid var(--border);border-radius:10px;padding:12px 16px;}
+  .bref b{color:var(--primary-light);}
+  .title-slide{justify-content:center;align-items:flex-start;}
+  .title-slide .big{font-size:4.2rem;font-weight:700;line-height:1.05;background:linear-gradient(135deg,var(--primary-light),var(--primary));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+  .title-slide .sub{font-size:1.6rem;color:var(--text-muted);margin-top:18px;}
+  .title-slide .by{margin-top:40px;font-size:1.2rem;}
+  .foottag{font-size:1.05rem;color:var(--text-muted);margin-top:8px;}
+  /* nav */
+  .nav-bar{position:fixed;bottom:0;left:0;right:0;background:rgba(15,23,42,.95);backdrop-filter:blur(10px);padding:13px 30px;display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--border);z-index:100;}
+  .nav-progress{display:flex;gap:6px;flex-wrap:wrap;max-width:55vw;}
+  .nav-dot{width:10px;height:10px;border-radius:50%;background:var(--border);cursor:pointer;transition:all .3s;}
+  .nav-dot.active{background:var(--primary);transform:scale(1.3);}
+  .nav-dot:hover{background:var(--primary-dark);}
+  .nav-right{display:flex;align-items:center;gap:14px;}
+  .nav-btn{background:var(--bg-dark);border:1px solid var(--border);color:var(--text-light);padding:9px 18px;border-radius:8px;cursor:pointer;transition:all .3s;font-size:.9rem;}
+  .nav-btn:hover{background:var(--primary);border-color:var(--primary);}
+  .slide-counter{font-size:.9rem;color:var(--text-muted);}
+  /* presenter notes panel */
+  #notes{position:fixed;left:0;right:0;bottom:52px;max-height:38vh;overflow-y:auto;background:rgba(20,36,48,.98);border-top:2px solid var(--secondary);padding:18px 30px 22px;z-index:90;display:none;}
+  #notes.show{display:block;}
+  #notes .lbl{font-family:'IBM Plex Mono',monospace;color:var(--secondary);font-size:.8rem;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;}
+  #notes .body{font-size:1.15rem;color:var(--text-light);line-height:1.45;}
+  .hint{position:fixed;top:14px;right:20px;font-size:.8rem;color:var(--text-muted);font-family:'IBM Plex Mono',monospace;z-index:100;}
+</style>
+</head>
+<body>
+<div class="hint">← → navigate · <b>N</b> notes · <b>F</b> fullscreen</div>
+<div class="presentation" id="deck">
+
+  <!-- 1 · TITLE -->
+  <div class="slide active title-slide" data-slide="1">
+    <div class="big">Vibe Coding,<br>the Pro Way</div>
+    <div class="sub">Building real software by directing AI — and staying the architect</div>
+    <div class="by"><span class="accent">Daryl Roberts</span> · Head of AI, obney.ai · <span class="muted">diesel mechanic → self-taught AI engineer</span></div>
+    <div class="foottag">BR User Groups · June 10, 2026</div>
+    <div data-speaker-note>Welcome. Honest frame up front: we will NOT finish an app tonight — you'll leave with the PROCESS. Quick hands: who's vibe-coded before? Who's been frustrated by AI coding? (Builds rapport.) Tonight I drive Claude Code, you watch; we build a real little app — the conference vendor QR scanner — as the vehicle.</div>
+  </div>
+
+  <!-- 2 · WHAT IS VIBE CODING -->
+  <div class="slide" data-slide="2">
+    <div class="slide-header"><h1 class="slide-title">What is vibe coding?</h1><p class="slide-subtitle">You describe; the AI builds; you steer.</p></div>
+    <div class="slide-content">
+      <p class="lead">Building software by <span class="accent">directing an AI in plain language</span> instead of typing every line yourself.</p>
+      <ul>
+        <li>You stay the <span class="accent">architect</span> — decisions, taste, and review are still yours.</li>
+        <li>The AI does the typing, the boilerplate, the busywork.</li>
+        <li><span class="coral">Not</span> "ignore the code and hope" — we keep a hand on the wheel.</li>
+      </ul>
+    </div>
+    <div data-speaker-note>Define it simply. Emphasize: vibe coding ≠ specs-to-code-and-ignore-the-code. The code is still the battleground. You're the architect; AI is the very fast junior who never sleeps. Tonight shows the disciplined version.</div>
+  </div>
+
+  <!-- 3 · WHAT IS AN LLM -->
+  <div class="slide" data-slide="3">
+    <div class="slide-header"><h1 class="slide-title">What is an LLM?</h1><p class="slide-subtitle">A prediction engine that thinks in text.</p></div>
+    <div class="slide-content">
+      <ul>
+        <li>A model trained to <span class="accent">predict the next piece of text</span> — scaled up until it can reason, code, and explain.</li>
+        <li>It "thinks" in the words you give it — so <span class="accent">what you put in front of it matters enormously</span>.</li>
+        <li>It has no memory between sessions — every fresh chat starts clean.</li>
+      </ul>
+    </div>
+    <div data-speaker-note>Keep it concrete for data folks: it's a probabilistic model — same family as the prediction stuff you already know, just enormous. Two properties drive everything tonight: (1) it reasons in the text you give it (context = its working memory), (2) it forgets between sessions. Those two facts shape the whole workflow.</div>
+  </div>
+
+  <!-- 4 · CLAUDE + CLAUDE CODE (live download cue) -->
+  <div class="slide" data-slide="4">
+    <div class="slide-header"><h1 class="slide-title">Who is "this Claude fellow"?</h1><p class="slide-subtitle">The model — and the model with hands.</p></div>
+    <div class="slide-content">
+      <div class="cards">
+        <div class="card"><h3>Claude</h3><p>Anthropic's LLM. Good at reasoning, code, and following instructions.</p></div>
+        <div class="card"><h3>Claude Code</h3><p>Claude with <span class="accent">hands</span> — it reads &amp; writes files and runs commands in a real project, right in your terminal.</p></div>
+      </div>
+      <div class="getit">
+        <div class="h">How to get it (we'll grab it together):</div>
+        <div class="u">claude.com/claude-code</div>
+        <div class="h">One command to install · runs in your terminal or your editor.</div>
+      </div>
+      <div class="cue"><span class="dot"></span>LIVE — hop to the Claude Code page and show the download</div>
+    </div>
+    <div data-speaker-note>Distinguish the model (Claude) from the agent (Claude Code). Claude Code is what makes it "vibe coding" vs "chatting" — it actually edits the repo and runs things. LIVE MOMENT: switch to the browser, go to claude.com/claude-code, show how simple it is to install (one command), and that it runs in the terminal / your editor. This is my daily driver and what we'll drive all night.</div>
+  </div>
+
+  <!-- 5 · SMART vs DUMB ZONE -->
+  <div class="slide" data-slide="5">
+    <div class="slide-header"><h1 class="slide-title">Smart zone vs dumb zone</h1><p class="slide-subtitle">The one idea that makes AI coding work.</p></div>
+    <div class="slide-content">
+      <div class="two-col">
+        <div class="zone smart"><h3>Smart zone</h3><p>Fresh, focused context. Small task. The model does its best work here.</p></div>
+        <div class="zone dumb"><h3>Dumb zone</h3><p>Context stuffed full (~100k+ tokens). Attention strained. It starts making silly mistakes.</p></div>
+      </div>
+      <ul>
+        <li><span class="accent">Keep tasks small</span> so the work fits in the smart zone.</li>
+        <li><span class="accent">Clear and restart, don't "compact."</span> The model is the guy from <em>Memento</em> — a fresh start is its smartest start.</li>
+        <li>Humans own <span class="accent">alignment &amp; planning</span>; agents do <span class="coral">implementation</span>.</li>
+      </ul>
+    </div>
+    <div data-speaker-note>This is the spine. Credit: Dex Horthy / Human Layer, popularized by Matt Pocock. As context fills, quality drops — roughly past ~100k tokens. So we size tasks small and start fresh often. I'll show the token counter live. "Clear vs compact": compacting keeps sediment; clearing returns to the model's sharpest state. Everything that follows exists to keep us in the green zone.</div>
+  </div>
+
+  <!-- 6 · THE WORKFLOW + SKILLS MAP -->
+  <div class="slide" data-slide="6">
+    <div class="slide-header"><h1 class="slide-title">How we stay in the smart zone</h1><p class="slide-subtitle">A simple workflow — and a "skill" that runs each step.</p></div>
+    <div class="slide-content">
+      <div class="flow">
+        <span class="step human">align</span><span class="arrow">→</span>
+        <span class="step human">destination</span><span class="arrow">→</span>
+        <span class="step human">slice</span><span class="arrow">→</span>
+        <span class="step afk">build &amp; test</span><span class="arrow">→</span>
+        <span class="step human">verify</span>
+      </div>
+      <ul>
+        <li><span class="skillcmd">/grill-with-docs</span> &nbsp;→&nbsp; <span class="skillcmd">/to-prd</span> &nbsp;→&nbsp; <span class="skillcmd">/to-issues</span> &nbsp;→&nbsp; <span class="skillcmd">/tdd</span></li>
+        <li><span class="accent">Skills are reusable workflows</span> — pull them in once, then call them with a <span class="coral">/slash command</span>.</li>
+      </ul>
+      <p class="muted">We already have ours installed (from <span class="mono">github.com/mattpocock/skills</span>). You get yours the same way — just <span class="accent">ask your Claude</span> to add them.</p>
+    </div>
+    <div data-speaker-note>This is the map for the night. We keep ourselves in the smart zone by following a workflow, and each step is a "skill" — a packaged expert prompt you call with a slash. Tell the room: I already have these installed; you grab them by literally asking Claude "add the grill-with-docs / to-prd / to-issues skills from github.com/mattpocock/skills." Now we'll walk each one — what it does and why — then use them for real.</div>
+  </div>
+
+  <!-- 7 · /grill-with-docs -->
+  <div class="slide" data-slide="7">
+    <div class="slide-header"><h1 class="slide-title">/grill-with-docs</h1><p class="slide-subtitle"><span class="step-tag">Step 1 · ALIGN</span> &nbsp;Get on the same page before any code.</p></div>
+    <div class="slide-content">
+      <p class="lead">The AI <span class="accent">interviews you</span> — one question at a time — until you both picture the same app.</p>
+      <ul>
+        <li>It walks the decision tree, surfaces what you hadn't thought of, and <span class="accent">recommends an answer each time</span> — you accept or redirect.</li>
+        <li>It captures the <span class="accent">shared words</span> (a glossary) and the big decisions, so they stick.</li>
+      </ul>
+      <div class="explain"><div class="lbl">How to say it</div>"The #1 reason AI coding goes sideways is you and the AI wanting different things. This fixes that — it grills you until you're aligned. It's the most important step; everything after is only as good as this."</div>
+    </div>
+    <div data-speaker-note>Matt Pocock's favorite skill — four sentences that change everything. The goal isn't a document, it's a SHARED DESIGN CONCEPT (Fred Brooks): you and the AI on the same wavelength. It asks relentlessly, recommends an answer, you steer. For beginners: it's a relentless, helpful teammate that asks the questions you forgot to. We'll run it live against our spec sheet. (Matt: "I needed to be on the same wavelength as my agent.")</div>
+  </div>
+
+  <!-- 8 · /to-prd -->
+  <div class="slide" data-slide="8">
+    <div class="slide-header"><h1 class="slide-title">/to-prd</h1><p class="slide-subtitle"><span class="step-tag">Step 2 · DESTINATION</span> &nbsp;Write down where we're going.</p></div>
+    <div class="slide-content">
+      <p class="lead">Turns the conversation into a <span class="accent">one-page plan</span> — the destination document.</p>
+      <ul>
+        <li>Problem · solution · user stories · what's <span class="accent">in &amp; out of scope</span> · definition of "done."</li>
+        <li>You don't agonize over it — you just <span class="accent">confirm the AI captured</span> what you agreed. (AI is great at summarizing.)</li>
+      </ul>
+      <div class="explain"><div class="lbl">How to say it</div>"Now we capture what we agreed on as a one-page destination — our north star. We skim it to check the AI got the gist; we don't re-read every word. It also tells us when we're <em>done</em>."</div>
+    </div>
+    <div data-speaker-note>Matt: the "destination document." Because AI is great at summarizing, we trust it to summarize our alignment and we just skim. PRD = Product Requirements Document. The most useful parts for beginners: the user stories ("as a vendor, I want to scan a badge so that…") and the OUT-OF-SCOPE list (that's how you avoid scope creep and know when to stop). We'll generate it live straight from the grill.</div>
+  </div>
+
+  <!-- 9 · /to-issues -->
+  <div class="slide" data-slide="9">
+    <div class="slide-header"><h1 class="slide-title">/to-issues</h1><p class="slide-subtitle"><span class="step-tag">Step 3 · SLICE</span> &nbsp;Cut it into bite-sized, end-to-end pieces.</p></div>
+    <div class="slide-content">
+      <p class="lead">Breaks the plan into small <span class="accent">vertical slices</span> — each a complete thread from button to result.</p>
+      <ul>
+        <li>"Tracer bullets": every slice <span class="accent">does something you can see and test</span>.</li>
+        <li><span class="coral">Not</span> "all the plumbing, then all the buttons" — that way you get no feedback until the end.</li>
+      </ul>
+      <div class="explain"><div class="lbl">How to say it</div>"We chop the work into thin slices, each one a full thread you can actually run. So we see something working after <em>every</em> slice — and it keeps each task small enough to stay in the smart zone."</div>
+    </div>
+    <div data-speaker-note>Matt's tracer-bullets idea (from The Pragmatic Programmer): if you fire in the dark you can't see where your shots land — tracer rounds glow so you get feedback. AI loves to build HORIZONTALLY (all one layer at a time), but then nothing works until the very end. We force VERTICAL slices: thin, complete threads through the whole stack. Each becomes a small, independently-grabbable task — and you can even run several in parallel. We'll slice our app live and pick the first one to build.</div>
+  </div>
+
+  <!-- 10 · /tdd -->
+  <div class="slide" data-slide="10">
+    <div class="slide-header"><h1 class="slide-title">/tdd</h1><p class="slide-subtitle"><span class="step-tag">Step 4 · BUILD &amp; TEST</span> &nbsp;Prove the logic works — test first.</p></div>
+    <div class="slide-content">
+      <p class="lead">Write a <span class="accent">tiny failing test</span> that describes the behavior, then just enough code to pass. Repeat.</p>
+      <ul>
+        <li><span class="accent">Red → Green → Refactor</span>, one behavior at a time.</li>
+        <li>The test is a clear target for the AI — and it's much <span class="accent">harder for it to "cheat."</span></li>
+      </ul>
+      <div class="explain"><div class="lbl">How to say it</div>"Where there's real logic, we write the test first — a little check that fails — then make it pass. The code actually works, it keeps working, and the AI has a bullseye to aim at."</div>
+    </div>
+    <div data-speaker-note>Matt: TDD is essential for getting the most out of agents — it adds good tests AND stops the AI from faking it (write code, then a test that just rubber-stamps it). Your feedback loops are the CEILING on AI quality. We already used this on the one piece of real logic in our app — reading a name+email off a QR code (5 tests, all green). We can pop those open. Don't TDD everything (not the UI) — use it where there's logic worth trusting.</div>
+  </div>
+
+  <!-- 11 · MCP -->
+  <div class="slide" data-slide="11">
+    <div class="slide-header"><h1 class="slide-title">MCP — giving Claude tools</h1><p class="slide-subtitle">Eyes and hands beyond the code.</p></div>
+    <div class="slide-content">
+      <p class="lead">Skills teach Claude <span class="accent">workflows</span>. <span class="accent">MCP</span> gives Claude <span class="accent">tools</span> — a standard way to plug in things that live outside the codebase.</p>
+      <ul>
+        <li>Tonight's star: <span class="accent">Playwright MCP</span> — let an agent <span class="accent">open the app in a real browser and QA it</span> like a user.</li>
+        <li>Your feedback loops are the <span class="coral">ceiling</span> on AI quality — tools that let it <em>see and test</em> raise that ceiling.</li>
+      </ul>
+      <div class="constraints"><b>Setup is one ask:</b> <span class="accent">"Claude, set up the Playwright MCP in this project."</span> It writes the config and wires it up → restart Claude Code → <span class="mono">/mcp</span> shows it's connected. That's the whole thing.</div>
+    </div>
+    <div data-speaker-note>Pair with skills: skills = workflows, MCP = tools. Frame simply — "how you give Claude tools." Playwright MCP is the wow: the agent drives a real browser to QA our app (same pattern as the obney ops workshop). Setup is genuinely one ask — I just told Claude "set up the Playwright MCP in this project," it wrote the config itself, I restarted Claude Code, done. (One prep tip: we ran it once beforehand so the browser is already downloaded and won't stall mid-demo.) We'll use it live to QA the Scan slice.</div>
+  </div>
+
+  <!-- 12 · WHAT WE'RE BUILDING — THE PROBLEM -->
+  <div class="slide" data-slide="12">
+    <div class="slide-header"><h1 class="slide-title">So… what are we building?</h1><p class="slide-subtitle">Start with the real problem.</p></div>
+    <div class="slide-content">
+      <div class="ba">
+        <div class="box bad"><h3>Today — paper raffle tickets</h3><p>Attendees print tickets with their name + email and hand them to vendors. People forget to print them, forget to bring them, or never signed up — so contacts get hand-labeled or lost.</p></div>
+        <div class="arrow-big">→</div>
+        <div class="box good"><h3>The fix — scan a badge</h3><p>An attendee wears a <span class="accent">QR badge</span>. A vendor <span class="accent">scans</span> it. At the end, the vendor has a clean <span class="accent">list to email</span> their team.</p></div>
+      </div>
+      <p class="muted">A real ask from the Day of Data organizing committee. ~10 vendors, ~400 attendees.</p>
+    </div>
+    <div data-speaker-note>Don't cut away to the markdown — the slides ARE the brief. Tell the story: vendors capture leads on paper raffle tickets today, and it's lossy. We're replacing paper with a scan. Keep it concrete and human. Over the next few slides the whole room gets the same picture of what we're building.</div>
+  </div>
+
+  <!-- 13 · WHO + GLOSSARY -->
+  <div class="slide" data-slide="13">
+    <div class="slide-header"><h1 class="slide-title">Who's in the picture</h1><p class="slide-subtitle">…and the words we'll all use.</p></div>
+    <div class="slide-content">
+      <div class="persona">
+        <div class="card"><h3>Vendor — the main user</h3><p>A booth operator. Opens the app on their phone, scans badges all day, and exports the list at the end.</p></div>
+        <div class="card"><h3>Attendee</h3><p>Wears a QR badge with their name + email. Doesn't use the app — they just get scanned.</p></div>
+      </div>
+      <div class="gloss">
+        <div class="g"><b>Badge</b> — a QR with name + email</div>
+        <div class="g"><b>Scan</b> — capture a badge with the camera</div>
+        <div class="g"><b>Lead</b> — a saved contact (name, email, time)</div>
+        <div class="g"><b>Export</b> — download / email the list</div>
+      </div>
+      <p class="muted">These shared words — our "ubiquitous language" — become the names in the code <em>and</em> on the screen. That's exactly what <span class="mono">/grill-with-docs</span> pins down.</p>
+    </div>
+    <div data-speaker-note>Two people, one set of words. Vendor is the only real user; the Attendee just wears a badge. Introduce the glossary out loud — these are the words we'll all use, and they'll show up verbatim in the code and UI. Callback: this is the shared language the grill step locks in, so the AI and we mean the same things.</div>
+  </div>
+
+  <!-- 14 · THE FLOW (hero visual) -->
+  <div class="slide" data-slide="14">
+    <div class="slide-header"><h1 class="slide-title">The flow</h1><p class="slide-subtitle">One vendor, one day.</p></div>
+    <div class="slide-content">
+      <div class="steps">
+        <div class="s"><span class="n">1</span> Open the app</div>
+        <span class="sa">→</span>
+        <div class="s"><span class="n">2</span> Tap <span class="accent">Scan</span></div>
+        <span class="sa">→</span>
+        <div class="s"><span class="n">3</span> Camera reads a <span class="accent">Badge</span></div>
+        <span class="sa">→</span>
+        <div class="s"><span class="n">4</span> <span class="accent">Lead saved</span> ✓ "Saved: Jane Doe"</div>
+        <span class="sa">↺</span>
+        <div class="s"><span class="n">5</span> Tap <span class="accent">Export</span></div>
+        <span class="sa">→</span>
+        <div class="s"><span class="n">6</span> CSV downloads / opens email</div>
+      </div>
+      <p class="muted">Steps 2–4 repeat all day; the list grows on the home screen. Everything stays on the vendor's phone — no server.</p>
+    </div>
+    <div data-speaker-note>Walk the journey out loud, left to right — this is the spine of the app. Emphasize the loop (2–4 repeat) and that step 4 gives instant feedback ("Saved: Jane Doe"). Point out there's no backend — it all lives on the phone. This flow is exactly what we'll slice up and build.</div>
+  </div>
+
+  <!-- 15 · SCOPE -->
+  <div class="slide" data-slide="15">
+    <div class="slide-header"><h1 class="slide-title">What it is — and isn't</h1><p class="slide-subtitle">Tight scope keeps us in the smart zone.</p></div>
+    <div class="slide-content">
+      <div class="cols3">
+        <div class="col must"><h3>✓ Must have (v1)</h3><ul><li>Scan a badge → read name + email</li><li>Save each Lead on the phone</li><li>Confirmation after each scan</li><li>Home list of Leads</li><li>Export to CSV (a button)</li></ul></div>
+        <div class="col should"><h3>+ If we have time</h3><ul><li>Badge generator (make a badge)</li><li>Day of Data branding</li><li>Installable / offline</li></ul></div>
+        <div class="col wont"><h3>✗ Not tonight</h3><ul><li>Accounts / central database</li><li>De-duplication</li><li>Delete button</li><li>Automatic emailing</li></ul></div>
+      </div>
+      <div class="constraints"><b>Ground rules:</b> a web app at a URL (on iPhone → the Safari tab) · stored on the phone (localStorage) · export is always a deliberate button press · HTTPS so the camera works.</div>
+    </div>
+    <div data-speaker-note>Scope is a feature. The "Not tonight" column is the important one — it's how we avoid scope creep and know when we're done (callback to /to-prd's out-of-scope list). The ground rules strip is the constraints we discovered (URL-first per ADR 0001, local storage, user-triggered export). We're deliberately keeping v1 tiny so each slice stays in the smart zone.</div>
+  </div>
+
+  <!-- 16 · THE PIECES (build map) -->
+  <div class="slide" data-slide="16">
+    <div class="slide-header"><h1 class="slide-title">How we'll build it — piece by piece</h1><p class="slide-subtitle">Vertical slices, smallest first.</p></div>
+    <div class="slide-content">
+      <div class="pieces">
+        <div class="piece first"><span class="tag">we build this first</span><div class="pn">1</div><div><h3>Scan</h3><p>Point at a badge → a Lead shows up. The first complete thread.</p></div></div>
+        <div class="piece"><div class="pn">2</div><div><h3>Leads list</h3><p>See everyone you've scanned, with a running count.</p></div></div>
+        <div class="piece"><div class="pn">3</div><div><h3>Export</h3><p>One button → CSV download / pre-filled email.</p></div></div>
+        <div class="piece"><div class="pn">4</div><div><h3>Badge generator <span class="muted">(stretch)</span></h3><p>Type a name + email → get a badge to scan.</p></div></div>
+      </div>
+      <p class="muted">Each piece is a complete, working slice — that's <span class="mono">/to-issues</span>. We get #1 working and QA it live; the rest is the "night shift."</p>
+    </div>
+    <div data-speaker-note>This is our build map and running checklist. Each numbered piece is a vertical slice (callback to /to-issues) — a complete, demoable thread, not a layer. NEXT: a quick "here's what we set up ahead of time," run the shell on a phone, then we build slice #1 (Scan) live and QA it with Playwright. Come back to this slide to mark progress as we go.</div>
+  </div>
+
+  <!-- 17 · BEHIND THE SCENES — framing -->
+  <div class="slide" data-slide="17">
+    <div class="slide-header"><h1 class="slide-title">First — don't grab the pitchforks</h1><p class="slide-subtitle">There's already an app. Here's the honest story.</p></div>
+    <div class="slide-content">
+      <p class="lead">We did a <span class="accent">little</span> prep so we don't spend our hour fighting setup.</p>
+      <div class="pitch-why"><b>The #1 rule:</b> don't start from a blank page — it's the hardest place to begin, for you <em>and</em> the AI. So we built a working shell; tonight we build the interesting part.</div>
+      <p class="label">How little it actually took:</p>
+      <div class="howlittle">
+        <span class="x">a conversation</span><span class="x">a handful of prompts</span><span class="x">two small decisions</span><span class="x">one tiny script</span><span class="x">~an hour — mostly the AI typing</span>
+      </div>
+    </div>
+    <div data-speaker-note>Put the room at ease — we didn't pre-build the magic, and there's no genius here. The prep IS the lesson: don't start from a blank page. Then "how little it took" — about an hour, mostly the AI doing the work. Full detail is in BEHIND_THE_SCENES.md if anyone wants it.</div>
+  </div>
+
+  <!-- 18 · HOW WE GOT HERE — SETUP -->
+  <div class="slide" data-slide="18">
+    <div class="slide-header"><h1 class="slide-title">How we actually got here — setup</h1><p class="slide-subtitle">The real steps — not just "a handful of prompts."</p></div>
+    <div class="slide-content">
+      <div class="tl">
+        <div class="row"><div class="mk">1</div><div class="txt"><b>Started from a real client meeting.</b> The conference committee, recorded. We turned that conversation into a one-page <b>spec</b> — plain English, no code. <span class="ask">Align before you build.</span></div></div>
+        <div class="row"><div class="mk">2</div><div class="txt"><b>Asked the AI to pick the right tool:</b> <span class="ask">"what's the best way to scan QR codes in a browser today?"</span> It flagged the most <em>popular</em> library (html5-qrcode) as <b>abandoned</b> — no release since 2023, known camera bugs — so we chose a maintained one.</div></div>
+        <div class="row"><div class="mk">3</div><div class="txt">That same research surfaced an <b>Apple bug</b>: the camera won't run in an installed home-screen app. <span class="ask">Decision:</span> keep it a plain <b>URL</b>, not an installed app — written down as a one-paragraph <b>ADR</b>.</div></div>
+        <div class="row"><div class="mk">4</div><div class="txt"><b>Let the AI scaffold the shell:</b> <span class="ask">"set up a small Vite + React app with the QR library."</span> It installed everything and handed back a running app — in minutes.</div></div>
+      </div>
+    </div>
+    <div data-speaker-note>This is the real story — reference the actual conversation if anyone asks. We didn't just "prompt an app into being." We started from a recorded client meeting, asked the AI to research the QR library (it saved us from an abandoned one AND surfaced the iOS camera bug), wrote that decision down as an ADR, then let it scaffold the shell. The value was in the research + the one decision — not the typing.</div>
+  </div>
+
+  <!-- 19 · HOW WE GOT HERE — MAKING IT SOLID -->
+  <div class="slide" data-slide="19">
+    <div class="slide-header"><h1 class="slide-title">How we got here — making it solid</h1><p class="slide-subtitle">Tests, sample data, and chasing one real snag.</p></div>
+    <div class="slide-content">
+      <div class="tl">
+        <div class="row"><div class="mk">5</div><div class="txt"><b>Test-drove the one piece of real logic</b> — reading a name + email off a badge — <b>test-first</b>. Five tiny cycles: encode a vCard → parse one back → tolerate real-world quirks (CRLF, extra fields) → ignore junk → round-trip. All green.</div></div>
+        <div class="row"><div class="mk">6</div><div class="txt"><b>Made 3 sample badges</b> with a one-screen script that <em>reuses that same tested code</em> — so the badges and the scanner can't drift apart.</div></div>
+        <div class="row"><div class="mk">7</div><div class="txt"><b>Gave the AI a browser</b> (Playwright) to open the app and QA it like a user.</div></div>
+        <div class="row"><div class="mk">8</div><div class="txt"><b>Tested on a real iPhone over a public link</b> — first try: a <b>403</b>. The dev server blocks unknown web addresses for security; the error told us the exact fix; we added <b>one line</b>. Camera confirmed on iOS + Android. <span class="ask">Snag → the error tells you the fix → done.</span></div></div>
+      </div>
+      <p class="muted">Grand total: a conversation, a few prompts, two decisions, one script — <b>about an hour, mostly the AI typing.</b></p>
+    </div>
+    <div data-speaker-note>The making-it-solid half. TDD on the one bit of real logic (reading a contact off a QR) — 5 small cycles, walk one if they're curious. Sample badges reuse the same tested code. Playwright gives the AI eyes. Then the real test: on a phone we hit a 403, the error named the fix, one line. The pattern — snag → error → fix — is the whole game, and it's reassuring, not scary. ~an hour total, mostly the AI typing. Full write-up: BEHIND_THE_SCENES.md.</div>
+  </div>
+
+  <!-- 20 · RUN IT -->
+  <div class="slide" data-slide="20">
+    <div class="slide-header"><h1 class="slide-title">Where we are — let's run it</h1><p class="slide-subtitle">The shell, live — on the laptop and on your phone.</p></div>
+    <div class="slide-content">
+      <a class="openbtn" href="http://localhost:5173" target="_blank" rel="noopener">▶ Open the app (laptop)</a>
+      <div class="phonebox">
+        <div class="badge-card"><div class="qrtile"><canvas id="appqr" width="190" height="190"></canvas></div><div class="nm">Open the app</div><div class="em">on your phone</div></div>
+        <div class="badge-card"><div class="qrtile"><canvas id="camqr" width="190" height="190"></canvas></div><div class="nm">Camera test</div><div class="em">check the camera works</div></div>
+        <div class="phone-url">
+          <div class="label">Tunnel URL:</div>
+          <input id="tunnelInput" placeholder="https://xxxx.trycloudflare.com" autocomplete="off" spellcheck="false">
+          <div class="label" style="margin-top:6px;">pre-filled by <span class="mono">npm run share</span> · or paste to regenerate</div>
+        </div>
+      </div>
+    </div>
+    <div data-speaker-note>LIVE: click "Open the app" on the projector — it's the bare "No leads yet" shell; that's our starting line. Make sure `npm run dev` and `npm run tunnel` are running. Paste the trycloudflare URL into the box → a QR appears → scan it to open the app on my phone. (Tip: you can also open this deck with #&lt;url&gt; on the end of the address to pre-fill the box.)</div>
+  </div>
+
+  <!-- 21 · SCAN THESE (sample badges) -->
+  <div class="slide" data-slide="21">
+    <div class="slide-header"><h1 class="slide-title">Scan these</h1><p class="slide-subtitle">Three sample attendees — once we build Scan, point your phone here.</p></div>
+    <div class="slide-content">
+      <div class="badges">
+        <div class="badge-card"><div class="qrtile"><canvas id="qr-ada" width="200" height="200"></canvas></div><div class="nm">Ada Lovelace</div><div class="em">ada@dayofdata.example</div></div>
+        <div class="badge-card"><div class="qrtile"><canvas id="qr-grace" width="200" height="200"></canvas></div><div class="nm">Grace Hopper</div><div class="em">grace@dayofdata.example</div></div>
+        <div class="badge-card"><div class="qrtile"><canvas id="qr-alan" width="200" height="200"></canvas></div><div class="nm">Alan Turing</div><div class="em">alan@dayofdata.example</div></div>
+      </div>
+      <p class="muted">These are vCard badges — even a phone's <span class="accent">native camera</span> reads them (handy fallback). We'll scan them with the app once Scan is built.</p>
+    </div>
+    <div data-speaker-note>Our sample attendee badges (vCards — the same ones in app/sample-badges). LIVE: on my phone, open the app (from the QR on the previous slide), and — once we've built the Scan slice — point it at these to add Leads. Until Scan exists, a native phone camera reads them too (they're contact cards). Project this big so the room can scan along.</div>
+  </div>
+
+  <!-- 22 · BUILD BOARD (stay here while coding) -->
+  <div class="slide" data-slide="22">
+    <div class="slide-header"><h1 class="slide-title">The build board</h1><p class="slide-subtitle">We stay here while we code — check off each slice, build top to bottom.</p></div>
+    <div class="slide-content">
+      <div class="board">
+        <div class="bp" data-key="scan"><div class="box">✓</div><div><div class="ttl">1 · Scan</div><div class="dw">Point the camera at a badge → a Lead appears ("Saved: Jane Doe").</div></div><div class="tag">▶ build this next</div></div>
+        <div class="bp" data-key="leads"><div class="box">✓</div><div><div class="ttl">2 · Leads list</div><div class="dw">The home screen shows everyone you've scanned + a running count.</div></div><div class="tag">▶ build this next</div></div>
+        <div class="bp" data-key="export"><div class="box">✓</div><div><div class="ttl">3 · Export</div><div class="dw">One button → CSV download / pre-filled email.</div></div><div class="tag">▶ build this next</div></div>
+        <div class="bp" data-key="badge"><div class="box">✓</div><div><div class="ttl">4 · Badge generator <span class="muted">(stretch)</span></div><div class="dw">Type a name + email → a scannable badge.</div></div><div class="tag">▶ build this next</div></div>
+      </div>
+      <div class="bref">
+        <span><b>Flow:</b> Open → Scan → Lead saved → Export &nbsp;·&nbsp; <b>Words:</b> Attendee · Vendor · Badge · Scan · Lead · Export</span>
+        <span><b>Ground rules:</b> a web app at a URL (iPhone → Safari tab) · stored on the phone (localStorage) · export is a button press · vCard badges</span>
+      </div>
+      <p class="muted" style="font-size:1rem;">Each row is a complete vertical slice (<span class="mono">/to-issues</span>): build it → QA with Playwright → <b>click to check it off</b> → move to the next.</p>
+    </div>
+    <div data-speaker-note>Home base for the live build — park here and keep it on a screen. Build top to bottom: Scan (the first complete vertical slice) → Leads list → Export; Badge generator is stretch. Click a row to check it off as we finish it — it saves, so it survives reloads — and the "next" marker shows what to build next. The reference strip keeps us honest to the spec: the flow, the ground rules (our architecture constraints), and the shared words. When we run grill-with-docs → to-prd → to-issues live, these are the slices that fall out.</div>
+  </div>
+
+</div>
+
+<div id="notes"><div class="lbl">Speaker notes</div><div class="body" id="notes-body"></div></div>
+
+<div class="nav-bar">
+  <div class="nav-progress" id="dots"></div>
+  <div class="nav-right">
+    <button class="nav-btn" id="prev">‹ Prev</button>
+    <span class="slide-counter" id="counter">1 / 11</span>
+    <button class="nav-btn" id="next">Next ›</button>
+  </div>
+</div>
+
+<script>
+  const slides=[...document.querySelectorAll('.slide')];
+  const dotsWrap=document.getElementById('dots');
+  const counter=document.getElementById('counter');
+  const notes=document.getElementById('notes');
+  const notesBody=document.getElementById('notes-body');
+  let cur=1; const total=slides.length;
+  let chan=null; try{ chan=new BroadcastChannel('june10-slides'); }catch(e){}
+
+  slides.forEach((_,i)=>{const d=document.createElement('div');d.className='nav-dot';d.onclick=()=>go(i+1);dotsWrap.appendChild(d);});
+  const dots=[...document.querySelectorAll('.nav-dot')];
+
+  function go(n,silent){
+    cur=Math.max(1,Math.min(total,n));
+    slides.forEach((s,i)=>s.classList.toggle('active',i+1===cur));
+    dots.forEach((d,i)=>d.classList.toggle('active',i+1===cur));
+    counter.textContent=cur+' / '+total;
+    const note=slides[cur-1].querySelector('[data-speaker-note]');
+    notesBody.textContent=note?note.textContent.trim():'(no notes)';
+    if(!silent){
+      if(chan)chan.postMessage({slide:cur});
+      try{localStorage.setItem('june10-slide',String(cur));}catch(e){}
+    }
+    document.querySelector('.slide.active').scrollTop=0;
+  }
+  if(chan)chan.onmessage=(e)=>{ if(e.data&&e.data.slide)go(e.data.slide,true); };
+  window.addEventListener('storage',(e)=>{ if(e.key==='june10-slide'&&e.newValue)go(parseInt(e.newValue,10),true); });
+  document.getElementById('prev').onclick=()=>go(cur-1);
+  document.getElementById('next').onclick=()=>go(cur+1);
+  document.addEventListener('keydown',e=>{
+    if(e.key==='ArrowRight'||e.key===' '||e.key==='PageDown'){e.preventDefault();go(cur+1);}
+    else if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();go(cur-1);}
+    else if(e.key.toLowerCase()==='n'){notes.classList.toggle('show');}
+    else if(e.key.toLowerCase()==='f'){if(!document.fullscreenElement)document.documentElement.requestFullscreen();else document.exitFullscreen();}
+    else if(e.key==='Home'){go(1);} else if(e.key==='End'){go(total);}
+  });
+  go(1);
+</script>
+<script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
+<script>
+  (function(){
+    function vcard(n,e){return 'BEGIN:VCARD\r\nVERSION:3.0\r\nFN:'+n+'\r\nEMAIL:'+e+'\r\nEND:VCARD';}
+    function draw(id,text,width){
+      var c=document.getElementById(id);
+      if(c&&window.QRious){ new QRious({element:c,value:text,size:width||200,foreground:'#142430',background:'#ffffff',level:'M'}); }
+    }
+    function buildBoard(){
+      var rows=[].slice.call(document.querySelectorAll('.bp'));
+      if(!rows.length) return;
+      function refreshNext(){
+        var found=false;
+        rows.forEach(function(r){
+          r.classList.remove('next');
+          if(!found && !r.classList.contains('done')){ r.classList.add('next'); found=true; }
+        });
+      }
+      rows.forEach(function(r){
+        var key='june10-build-'+r.getAttribute('data-key');
+        try{ if(localStorage.getItem(key)==='1') r.classList.add('done'); }catch(e){}
+        r.addEventListener('click',function(){
+          r.classList.toggle('done');
+          try{ localStorage.setItem(key, r.classList.contains('done')?'1':'0'); }catch(e){}
+          refreshNext();
+        });
+      });
+      refreshNext();
+    }
+    function init(){
+      buildBoard();
+      draw('qr-ada',  vcard('Ada Lovelace','ada@dayofdata.example'),200);
+      draw('qr-grace',vcard('Grace Hopper','grace@dayofdata.example'),200);
+      draw('qr-alan', vcard('Alan Turing','alan@dayofdata.example'),200);
+      var inp=document.getElementById('tunnelInput');
+      if(inp){
+        var renderAll=function(){
+          var v=(inp.value||'').trim().replace(/\/+$/,'');
+          if(v){ draw('appqr',v,190); draw('camqr',v+'/camera-test.html',190); }
+        };
+        inp.addEventListener('input',renderAll);
+        if(location.hash.length>1){ try{ inp.value=decodeURIComponent(location.hash.slice(1)); }catch(e){} renderAll(); }
+        else {
+          fetch('tunnel.json?t='+Date.now())
+            .then(function(r){return r.json();})
+            .then(function(d){ if(d&&d.url){ inp.value=d.url; renderAll(); } })
+            .catch(function(){});
+        }
+      }
+    }
+    if(document.readyState!=='loading') init(); else document.addEventListener('DOMContentLoaded',init);
+  })();
+</script>
+</body>
+</html>

@@ -53,6 +53,16 @@ npm test
 | `src/lib/vcard.ts` | the one piece of real logic (read a name + email off a QR), with tests |
 | `spec_sheet.md` | the one-page brief we build from |
 | `sample-badges/` | sample QR badges to scan (open `sample-badges/index.html`) |
+| `slides/` | the meetup deck + speaker notes (for the presenter — see below) |
+
+## Presenter — the slides
+
+With the app running (`npm run dev`), the deck is served too:
+
+- Presentation → **http://localhost:5173/slides/index.html** (drag to the projector)
+- Speaker notes → **http://localhost:5173/slides/speaker-notes.html** (keep on your laptop screen — it stays in sync)
+
+Controls: **← / →** move both windows · **N** toggles the in-deck notes overlay · **F** fullscreen. Run `npm run share` to bake a phone tunnel URL into the deck's slide 18 QR codes.
 
 ## Good to know
 

@@ -7,7 +7,7 @@
 #   (terminal 2)  npm run share
 
 # Optional: where the slides live (only present in the full session setup).
-SLIDES_DIR="$(cd "$(dirname "$0")/../../slides" 2>/dev/null && pwd || true)"
+SLIDES_DIR="$(cd "$(dirname "$0")/../slides" 2>/dev/null && pwd || true)"
 TMP="$(mktemp)"
 
 bake() { [ -n "$SLIDES_DIR" ] && printf '{"url":"%s"}\n' "$1" > "$SLIDES_DIR/tunnel.json"; }
