@@ -12,6 +12,10 @@ dist
 dist-ssr
 *.local
 
+# Playwright MCP demo artifacts (regenerated live during the agent-QA segment)
+.playwright-mcp/
+*-via-mcp.png
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
