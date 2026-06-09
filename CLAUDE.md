@@ -1,18 +1,29 @@
 # Day of Data — Vendor App
 
-Scaffold + vehicle for the **June 10 vibe-coding meetup** (a live Claude Code demo of the
-spec → grill → PRD → issues → build → Playwright-QA workflow).
+A small mobile web app: scan an attendee's QR badge → save a **Lead** → **Export** a CSV. Built live at the June 10 vibe-coding meetup; this repo is the starting shell.
 
-**If you are resuming prior work, read [`HANDOFF.md`](./HANDOFF.md) first.**
-Broader prep docs are one level up in `../`: `CONTEXT.md`, `run_of_show.md`, `spec_sheet.md`,
-`PRD.md`, `issues/`, `docs/adr/`, `slides/`, `HOW_TO_RUN.md`.
+## Helping someone run this — assume they have NOTHING installed
 
-## Working agreements
-- Build with **TDD** where there's logic (the vCard helper in `src/lib/vcard.ts` was — 5 tests).
-- **Never assume; chase bugs to root cause.**
-- The **Scan / leads-list / Export** features are built **live at the meetup** — keep the home bare until then.
-- App is **URL-first, not an installable PWA** (iOS standalone camera bug — see `../docs/adr/0001-url-first-not-installable-pwa.md`). Badge payload = **vCard**.
+If the person asks to run the app (or says *"set me up"*), do it **for** them and explain each step in plain language — assume zero coding knowledge:
 
-## Run
-`npm run dev` (→ localhost:5173, camera works on localhost) · `npm test` · `npm run badges` · `npm run build`.
-Playwright MCP is wired in `.mcp.json` (`/mcp` to confirm).
+1. **Node.js** — run `node -v`. If it's missing or below 20, install it (tell them you're "installing the engine that runs the app"):
+   - **macOS:** `brew install node` if Homebrew exists; otherwise send them to [nodejs.org](https://nodejs.org) (LTS installer) or install `nvm`.
+   - **Windows / Linux:** the installer at [nodejs.org](https://nodejs.org), or `nvm`.
+2. **Dependencies** — `npm install` in this folder. ("Downloading what the app needs — about a minute.")
+3. **Start it** — `npm run dev`, then tell them to open **http://localhost:5173** in a browser.
+4. **On their phone (optional)** — `npm run share`, then give them the printed `https://….trycloudflare.com` link (on iPhone: open in the **Safari tab**).
+5. If anything errors, **read the actual error and fix the root cause** — don't guess.
+
+## What gets built live (keep the home screen bare until then)
+
+Scan → Leads list → Export (stretch: a Badge generator). The one bit of real logic — reading a contact off a QR — lives in `src/lib/vcard.ts` and is covered by tests (`npm test`). Build new logic with **TDD**.
+
+## Decisions / working agreements
+
+- **URL-first, not an installed PWA:** iOS blocks the camera in standalone (home-screen) mode, so keep it a browser-tab web app.
+- Build with **TDD** where there's real logic. **Never assume; chase bugs to root cause.**
+- Stack: Vite + React + TypeScript · `qr-scanner` (scan) · `qrcode` (badges) · `localStorage` · deploy to any static host.
+
+## Commands
+
+`npm run dev` · `npm test` · `npm run build` · `npm run share` (view on a phone via a tunnel) · `npm run badges` (regenerate sample badges). Playwright MCP is wired in `.mcp.json` for agent QA.

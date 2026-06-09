@@ -1,25 +1,61 @@
-# Day of Data — Vendor App (scaffold)
+# Day of Data — Vendor App
 
-Starting shell for the **June 10 vibe-coding meetup**. We build the rest live from here:
-**Scan an attendee's vCard QR badge → append a Lead → export CSV.**
+A tiny phone web app that **scans attendee QR badges and exports the leads** — the app we build together at the June 10 vibe-coding meetup. What's here is the starting shell; we add the fun parts (scan, leads list, export) **live**.
 
-## Run
+---
+
+## ▶ Run it — even if you've never coded (the easy way)
+
+You don't need to know git, React, or anything. Let **Claude Code** do the whole setup for you:
+
+1. **Install Claude Code** → [claude.com/claude-code](https://claude.com/claude-code) (one install).
+2. **Open Claude Code in this folder.**
+3. Type: **"set me up and run the app."**
+
+Claude will install anything that's missing (even Node.js), install the app, start it, and tell you the link to open. That's it.
+
+---
+
+## Run it — the manual way
+
+First, install **Node.js 20 or newer** (one time): [nodejs.org](https://nodejs.org) → download the **LTS** installer and run it.
+
+Then, in this folder:
+
 ```bash
-npm install
-npm run dev      # http://localhost:5173  (localhost is a secure context → camera works on the laptop)
-npm test         # vitest (the vCard helper is TDD-covered)
-npm run build    # typecheck + production build
+npm install     # downloads what the app needs (takes a minute, first time only)
+npm run dev     # starts it → open http://localhost:5173 in your browser
 ```
 
-## Camera / HTTPS notes (important — read before demoing)
-- The camera needs a **secure context**. `localhost` counts as secure, so scanning works on the **laptop** in dev (use the laptop webcam on a printed badge).
-- On a **phone**, use the deployed **Vercel HTTPS URL**. A phone hitting the laptop's LAN IP over plain `http` is **not** secure → the camera is blocked.
-- **iOS:** open the app in the Safari **tab**, *not* an installed / "Add to Home Screen" app — Apple blocks the camera in standalone PWA mode. See [`../docs/adr/0001-url-first-not-installable-pwa.md`](../docs/adr/0001-url-first-not-installable-pwa.md).
+> One-liner: `npm start` does both of the above.
 
-## Deploy (Vercel)
-`npx vercel` (or import the repo at vercel.com). Framework auto-detects as **Vite**; build `npm run build`, output `dist/`.
+## 📱 See it on your phone
 
-## What's already wired in
-- `src/lib/vcard.ts` — **tested** vCard encode/parse, shared by sample-badge generation and the live scanner.
-- `qr-scanner` + `qrcode` installed (not yet used in the UI — that's the live build).
-- `spec_sheet.md` committed at repo root, so `/grill-with-docs` can read it live.
+```bash
+npm run share   # prints a https://….trycloudflare.com link
+```
+
+Open that link on your phone. On **iPhone, open it in the Safari tab** (not "Add to Home Screen") — the camera only works in the tab.
+
+## Run the tests
+
+```bash
+npm test
+```
+
+---
+
+## What's in here
+
+| | |
+|---|---|
+| `src/` | the app — React + Vite + TypeScript |
+| `src/lib/vcard.ts` | the one piece of real logic (read a name + email off a QR), with tests |
+| `spec_sheet.md` | the one-page brief we build from |
+| `sample-badges/` | sample QR badges to scan (open `sample-badges/index.html`) |
+
+## Good to know
+
+- It's a **web app you open at a URL** — not an app-store app.
+- On **iPhone the camera only works in the Safari tab**, so we keep it URL-first (not an installed app).
+- The **Scan / leads list / Export** features get built **live** at the meetup — the home screen is intentionally bare to start.

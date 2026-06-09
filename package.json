@@ -12,7 +12,8 @@
     "test:watch": "vitest",
     "badges": "tsx scripts/generate-badges.ts",
     "tunnel": "npx --yes cloudflared tunnel --url http://localhost:5173",
-    "share": "bash scripts/share.sh"
+    "share": "bash scripts/share.sh",
+    "start": "npm install && npm run dev"
   },
   "dependencies": {
     "qr-scanner": "^1.4.2",
