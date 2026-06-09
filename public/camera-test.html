@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<link rel="icon" href="/favicon.svg">
+<title>Camera Test — Vendor App</title>
+<style>
+  :root{color-scheme:dark}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,sans-serif;background:#142430;color:#fff5eb;padding:16px;text-align:center}
+  h1{color:#a8f0f4;font-size:1.3rem;margin:0 0 4px}
+  .muted{color:#6b8a99;font-size:.85rem;margin:0 0 14px}
+  button{font-size:1.1rem;padding:14px 26px;border-radius:12px;border:1px solid #2bb8c4;background:#2bb8c4;color:#0d1b24;font-weight:600;cursor:pointer}
+  #status{margin:14px auto;max-width:30rem;padding:12px 16px;border-radius:10px;border:1px solid #2d4a5a;background:#1a2e3b;font-size:1rem;line-height:1.4}
+  #status.ok{border-color:#7bc47f;color:#cdebce}
+  #status.err{border-color:#d85858;color:#f3c9c9}
+  #status.live{border-color:#2bb8c4}
+  video{width:100%;max-width:30rem;border-radius:14px;background:#000;margin-top:8px;display:none}
+  #result{margin:14px auto;max-width:30rem;padding:14px 16px;border-radius:12px;border:1px solid #7bc47f;background:rgba(123,196,127,.12);display:none;text-align:left}
+  #result .nm{font-size:1.2rem;color:#a8f0f4;font-weight:600}
+  #result .em{font-family:ui-monospace,monospace;color:#cdebce}
+  #result .raw{margin-top:8px;font-family:ui-monospace,monospace;font-size:.75rem;color:#6b8a99;word-break:break-all}
+  #diag{margin:18px auto 0;max-width:30rem;text-align:left;font-family:ui-monospace,monospace;font-size:.78rem;color:#6b8a99;border-top:1px solid #2d4a5a;padding-top:12px}
+  #diag b{color:#a8f0f4}
+  .bad{color:#e07850}
+  .good{color:#7bc47f}
+</style>
+</head>
+<body>
+  <h1>Camera Test</h1>
+  <p class="muted">Proves the rear camera + QR scanning work in this browser. Point it at a sample badge.</p>
+  <button id="start">Start camera</button>
+  <div id="status">Tap “Start camera”. (You'll get a permission prompt — allow it.)</div>
+  <video id="video" playsinline muted></video>
+  <div id="result"></div>
+  <div id="diag"></div>
+
+  <canvas id="canvas" hidden></canvas>
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const statusEl = $('status'), video = $('video'), canvas = $('canvas'), result = $('result');
+    function setStatus(msg, cls){ statusEl.textContent = msg; statusEl.className = cls || ''; }
+
+    // Diagnostics — this is what confirms ADR 0001 on your actual device
+    const standalone = (window.navigator.standalone === true) ||
+      (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
+    $('diag').innerHTML =
+      '<b>Diagnostics</b><br>' +
+      'URL: ' + location.href + '<br>' +
+      'Secure context: <span class="' + (window.isSecureContext?'good':'bad') + '">' + window.isSecureContext + '</span>' +
+      ' (camera requires HTTPS or localhost)<br>' +
+      'Standalone/installed mode: <span class="' + (standalone?'bad':'good') + '">' + standalone + '</span>' +
+      (standalone ? ' ⚠️ installed mode — iOS blocks the camera here; open in the Safari TAB instead' : ' (good — running in a browser tab)') + '<br>' +
+      'getUserMedia available: <span class="' + (navigator.mediaDevices && navigator.mediaDevices.getUserMedia?'good':'bad') + '">' +
+      !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) + '</span><br>' +
+      'UA: ' + navigator.userAgent;
+
+    let stream = null, raf = null;
+
+    function parseVCard(text){
+      if(!/BEGIN:VCARD/i.test(text)) return null;
+      let name='', email='';
+      for(const raw of text.split(/\r\n|\r|\n/)){
+        const line = raw.trim(); const c = line.indexOf(':'); if(c<0) continue;
+        const key = line.slice(0,c).split(';')[0].toUpperCase(); const val = line.slice(c+1).trim();
+        if(key==='FN') name=val; else if(key==='EMAIL') email=val;
+      }
+      return (name&&email) ? {name,email} : null;
+    }
+
+    function tick(){
+      if(video.readyState === video.HAVE_ENOUGH_DATA){
+        canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(video,0,0,canvas.width,canvas.height);
+        const img = ctx.getImageData(0,0,canvas.width,canvas.height);
+        const code = (typeof jsQR==='function') ? jsQR(img.data, img.width, img.height) : null;
+        if(code && code.data){
+          const vc = parseVCard(code.data);
+          result.style.display='block';
+          result.innerHTML = vc
+            ? '<div class="nm">✅ ' + vc.name + '</div><div class="em">' + vc.email + '</div><div class="raw">' + code.data.replace(/[<>]/g,'') + '</div>'
+            : '<div class="nm">Scanned (not a vCard badge)</div><div class="raw">' + code.data.replace(/[<>]/g,'') + '</div>';
+          setStatus('Scanned! Keep scanning or stop.', 'ok');
+          if(navigator.vibrate) navigator.vibrate(120);
+        }
+      }
+      raf = requestAnimationFrame(tick);
+    }
+
+    $('start').onclick = async () => {
+      setStatus('Requesting camera…');
+      try{
+        stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } }, audio: false });
+        video.srcObject = stream; video.style.display='block';
+        await video.play();
+        setStatus('Camera live — point it at a sample badge QR.', 'live');
+        raf = requestAnimationFrame(tick);
+      }catch(err){
+        setStatus('Camera error: ' + err.name + ' — ' + err.message, 'err');
+      }
+    };
+  </script>
+</body>
+</html>

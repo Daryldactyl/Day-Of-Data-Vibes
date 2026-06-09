@@ -1,7 +1,7 @@
 # HANDOFF — June 10 Vibe-Coding Meetup prep
 
 > You are resuming work after a session restart. **Read this first**, then the docs it points to.
-> You're in the app repo: `~/Desktop/Code/vibe_coding_june10/app/`. The broader prep lives one level up in `~/Desktop/Code/vibe_coding_june10/` (referenced below as `../`).
+> You're in the app repo: `~/Desktop/Code/Day-Of-Data-Vibes/app/`. The broader prep lives one level up in `~/Desktop/Code/Day-Of-Data-Vibes/` (referenced below as `../`).
 > Date context: built 2026-06-09; **the meetup is tomorrow, 2026-06-10, 5:30–7:00pm.**
 
 ## What this event is (1 paragraph)
@@ -28,14 +28,14 @@ A **live Claude Code demo of the professional AI-engineering workflow** (smart-z
 ## Exact run commands
 ```bash
 # App (live-build starting point)
-cd ~/Desktop/Code/vibe_coding_june10/app
+cd ~/Desktop/Code/Day-Of-Data-Vibes/app
 npm run dev        # http://localhost:5173  (localhost = secure context → laptop webcam scans)
 npm test           # vCard helper, 5 passing
 npm run badges     # regenerate sample vCard badges → ./sample-badges/
 npm run build      # typecheck + production build ;  deploy: npx vercel
 
 # Slides + synced second-screen notes (serve so BroadcastChannel syncs; file:// won't)
-cd ~/Desktop/Code/vibe_coding_june10/slides && python3 -m http.server 8080
+cd ~/Desktop/Code/Day-Of-Data-Vibes/slides && python3 -m http.server 8080
 #   presentation → http://localhost:8080/      (drag to projector / share this window)
 #   speaker notes → http://localhost:8080/speaker-notes.html   (your screen only)
 

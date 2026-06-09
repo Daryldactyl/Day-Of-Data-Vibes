@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "badges": "tsx scripts/generate-badges.ts"
+    "badges": "tsx scripts/generate-badges.ts",
+    "tunnel": "npx --yes cloudflared tunnel --url http://localhost:5173"
   },
   "dependencies": {
     "qr-scanner": "^1.4.2",
