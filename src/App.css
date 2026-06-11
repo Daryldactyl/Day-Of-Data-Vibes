@@ -46,6 +46,47 @@
   line-height: 1.55;
 }
 
+.leads {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.count {
+  margin: 0 0 14px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #a8f0f4;
+}
+
+.lead-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.lead {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px 14px;
+  background: #1b3240;
+  border: 1px solid #2d4a5a;
+  border-radius: 10px;
+}
+
+.lead-name {
+  font-weight: 600;
+}
+
+.lead-email {
+  color: #6b8a99;
+  font-size: 0.9rem;
+}
+
 .foot {
   padding: 16px 20px;
   border-top: 1px solid #2d4a5a;
