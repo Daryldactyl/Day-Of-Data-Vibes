@@ -2,9 +2,17 @@ import { useState } from 'react'
 import './App.css'
 import { loadLeads } from './lib/leadsStorage'
 import type { Lead } from './lib/leads'
+import { ScanOverlay } from './ScanOverlay'
+import type { CreateScanner } from './scanner'
 
-export default function App() {
-  const [leads] = useState<Lead[]>(() => loadLeads())
+interface AppProps {
+  /** Inject a fake scanner in tests; defaults to the real camera scanner. */
+  createScanner?: CreateScanner
+}
+
+export default function App({ createScanner }: AppProps = {}) {
+  const [leads, setLeads] = useState<Lead[]>(() => loadLeads())
+  const [scanning, setScanning] = useState(false)
 
   return (
     <main className="app">
@@ -37,9 +45,22 @@ export default function App() {
         </section>
       )}
 
+      <button className="scan-button" type="button" onClick={() => setScanning(true)}>
+        Scan
+      </button>
+
       <footer className="foot">
         Attendee · Vendor · Badge · Scan · Lead · Export
       </footer>
+
+      {scanning ? (
+        <ScanOverlay
+          leads={leads}
+          onLeadsChange={setLeads}
+          onDone={() => setScanning(false)}
+          createScanner={createScanner}
+        />
+      ) : null}
     </main>
   )
 }

@@ -11,13 +11,20 @@ Because of email dedup, a Badge held in frame (~25 decodes/sec) only ever produc
 
 ## Acceptance criteria
 
-- [ ] Tapping Scan opens a full-screen camera overlay using the rear camera
-- [ ] Scanning a `sample-badges/` Badge adds a Lead and shows "Saved: <name>"
-- [ ] Re-scanning an already-saved Attendee shows "Already saved: <name>" and adds no row
-- [ ] A Badge lingering in frame produces exactly one Lead
-- [ ] Tapping Done stops the camera and returns to the Leads list, which shows the new Lead
-- [ ] Verified live by scanning a sample Badge over the `npm run share` tunnel (HTTPS)
-- [ ] A Playwright MCP QA pass exercises the Scan → list flow (camera input stubbed where a real camera isn't available)
+- [x] Tapping Scan opens a full-screen camera overlay using the rear camera (`preferredCamera: 'environment'`)
+- [x] Scanning a `sample-badges/` Badge adds a Lead and shows "Saved: <name>"
+- [x] Re-scanning an already-saved Attendee shows "Already saved: <name>" and adds no row
+- [x] A Badge lingering in frame produces exactly one Lead (dedup by normalized email — ADR-0002)
+- [x] Tapping Done stops the camera (`stop()`/`destroy()`) and returns to the Leads list, which shows the new Lead
+- [ ] Verified live by scanning a sample Badge over the `npm run share` tunnel (HTTPS) — **pending: requires the user's phone + a real camera; `npm run share` then scan a `sample-badges/` PNG in a Safari tab**
+- [x] A Playwright MCP QA pass exercises the Scan → list flow (camera input injected via a DEV-only `window.__scanBadge` seam where a real camera isn't available)
+
+## Implementation notes (Slice 2)
+
+- **Pure scan reducer** `src/lib/scan.ts` — `handleScan(leads, rawQrText, scannedAt) → { leads, notification: 'saved' | 'duplicate' | 'not-a-badge', contact }`. Runs `parseVCard`, delegates dedup to `addLead`. Returns the parsed `contact` so the UI can name the toast without re-parsing. Fully TDD'd (`src/lib/scan.test.ts`, 4 cases).
+- **Overlay** `src/ScanOverlay.tsx` — full-screen `<video>` + HUD (live count, Done) + non-blocking toast. Camera lifecycle in a mount-once effect; `leads`/`onLeadsChange` mirrored into refs (synced in an effect) so the long-lived `onDecode` closure always reads the current list.
+- **Scanner seam** `src/scanner.ts` — `CreateScanner` factory injected into `App`/`ScanOverlay`; defaults to the real `qr-scanner`, replaced by a fake in the durable RTL test (`src/App.scan.test.tsx`). DEV-only `window.__scanBadge(text)` exposes the same decode handler for live Playwright injection (stripped from prod builds).
+- **Tests:** 20 passing (`npm test`); `tsc -b` and `npm run lint` clean.
 
 ## Blocked by
 
