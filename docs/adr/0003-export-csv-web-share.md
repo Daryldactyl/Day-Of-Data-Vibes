@@ -1,0 +1,7 @@
+# Export delivers a CSV via the Web Share API, falling back to download
+
+The spec left Export's delivery open (CSV download vs `mailto:` vs both). We build the CSV in browser memory and hand it off with the **Web Share API** — `navigator.share({ files: [csv] })` when `navigator.canShare({ files: [csv] })` is true, which opens the phone's native share sheet with the CSV as a real attachment — and **fall back to a Blob `<a download>`** when it isn't (desktop, older browsers, local dev).
+
+Why: the goal is for a Vendor to email their collected Leads to their sales team, and the app is phone-first. **`mailto:` was rejected** because it cannot attach a file — it can only prefill body text, which is length-limited and useless for hundreds of Leads. The Web Share path lets the Vendor tap **Mail** in the share sheet and get the CSV attached in a single gesture — the very thing `mailto:` couldn't do. It also **sidesteps iOS Safari's unreliable Blob-download-to-Files behavior** (the same URL-first / iOS-camera constraint that drove ADR-0001's no-PWA call), since on mobile the share sheet is used, not a download. The download fallback keeps desktop and local dev working. Web Share requires HTTPS and a user gesture — both already satisfied (the field URL is HTTPS via the `npm run share` tunnel; Export is a deliberate button tap, per `CONTEXT.md`).
+
+Recorded because a future reader will see two code paths and wonder why we didn't "just download" or "just `mailto:`"; the choice is a real trade-off driven by an iOS constraint not visible in the code.

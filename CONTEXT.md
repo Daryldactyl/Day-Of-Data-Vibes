@@ -22,7 +22,7 @@ A captured Attendee record — name, email, and the timestamp of the Scan — in
 _Avoid_: Contact (use Lead in code and UI).
 
 **Export**:
-A Vendor-triggered build of a CSV of all Leads, downloaded (and/or opened via `mailto:`). Always a deliberate button press, never automatic.
+A Vendor-triggered build of a CSV file of all Leads, downloaded to the Vendor's device. Always a deliberate button press, never automatic.
 
 **Badge Generator** _(should-have)_:
 A view that mints a Badge QR from a typed name + email, so Attendees can self-serve and the demo is self-contained.

@@ -96,21 +96,45 @@
   font-family: ui-monospace, Consolas, monospace;
 }
 
-/* --- Scan button (Home) --- */
-.scan-button {
+/* --- Home action buttons (Scan / Export) --- */
+.actions {
+  display: flex;
+  gap: 12px;
   margin: 0 20px 18px;
+}
+
+.scan-button,
+.export-button {
+  flex: 1;
   padding: 16px;
   font-size: 1.15rem;
   font-weight: 700;
   color: #0c1a22;
-  background: #4ad6c4;
   border: none;
   border-radius: 12px;
   cursor: pointer;
 }
 
+.scan-button {
+  background: #4ad6c4;
+}
+
 .scan-button:active {
   background: #3bbdad;
+}
+
+.export-button {
+  background: #8bd64a;
+}
+
+.export-button:active {
+  background: #74bd3b;
+}
+
+.export-button:disabled {
+  background: #2a3a42;
+  color: #5e6e76;
+  cursor: not-allowed;
 }
 
 /* --- Full-screen camera overlay --- */
