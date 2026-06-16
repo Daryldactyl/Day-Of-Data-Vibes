@@ -1,9 +1,8 @@
 # PRD — Scan & Collect Leads
 
 **Status:** ready to build
-**Date:** 2026-06-10
 **Scope:** The Vendor's Scan feature — tap a camera button → open the camera → scan Attendee Badges → collect de-duplicated Leads.
-**Sources:** `spec_sheet.md`, `CONTEXT.md`, `docs/adr/0001-vcard-badge-payload.md`, `docs/adr/0002-dedupe-leads-by-email.md`, `docs/qa-sessions/2026-06-10-scan-feature-grilling.md`
+**Sources:** `spec_sheet.md`, `CONTEXT.md`, `docs/adr/0001-vcard-badge-payload.md`, `docs/adr/0002-dedupe-leads-by-email.md`, `docs/qa-sessions/scan-feature-grilling.md`
 **Vocabulary:** Uses the project glossary in `CONTEXT.md` — Attendee, Vendor, Badge, Scan, Lead, Export.
 
 ---
@@ -82,5 +81,5 @@ From the Vendor's phone browser, the Home screen shows their running Leads (coun
 ## Further Notes
 
 - This PRD is intentionally local (`docs/prd/`), matching the README and ADRs — no issue tracker is used for this project.
-- The two hard-to-reverse decisions behind it are recorded as ADR-0001 (vCard payload) and ADR-0002 (email dedup); the full grilling transcript, including questions adopted without live debate, is in `docs/qa-sessions/2026-06-10-scan-feature-grilling.md`.
+- The two hard-to-reverse decisions behind it are recorded as ADR-0001 (vCard payload) and ADR-0002 (email dedup); the full grilling transcript, including questions adopted without live debate, is in `docs/qa-sessions/scan-feature-grilling.md`.
 - Build order suggestion: TDD `addLead` first (red→green), add the thin storage seam, then wire the `qr-scanner` overlay + toasts on top and QA against `sample-badges/` via the tunnel.

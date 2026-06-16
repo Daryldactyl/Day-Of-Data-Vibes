@@ -1,4 +1,4 @@
-# Export download bug — investigation notes (2026-06-16)
+# Export download bug — investigation notes
 
 > Captured before grilling the fix. Discipline: **chase to root cause, never assume.**
 > Source of report: the Vendor (user) — clicking **Export** produced an unusable file.
@@ -27,7 +27,7 @@ download: downloadFile,
 - `canShare` true  → `navigator.share({ files: [file] })`  (the "mobile share sheet → Mail" path, ADR-0003)
 - `canShare` false → `downloadFile(file)`                    (object-URL + `<a download>` anchor)
 
-## Measured facts (Playwright, this macOS machine, Chromium, 2026-06-16)
+## Measured facts (Playwright, this macOS machine, Chromium)
 
 1. **`navigator.canShare({ files: [csv] })` === `true`** on this desktop macOS machine.
    → Therefore Export takes the **share** branch (`navigator.share`), **not** the download branch.

@@ -62,7 +62,7 @@ the domain; **not** a strict RFC regex). The empty/invalid state shows a friendl
   round-trip proven on real pixels** — decoding the rendered QR (jsQR) returned exactly
   `BEGIN:VCARD … FN:Ada Lovelace … EMAIL:ada@dayofdata.example … END:VCARD`, the same vCard the app's scanner
   parses. Done returns to Home with Leads intact.
-- Implemented by a subagent from `docs/handoffs/2026-06-16-slice-8-badge-generator-on-screen-qr.md`;
+- Implemented by a subagent from `docs/handoffs/slice-8-badge-generator-on-screen-qr.md`;
   independently inspected (re-read code, re-ran suite/tsc/lint, drove the live QA + QR-decode round-trip).
 
 ## Blocked by

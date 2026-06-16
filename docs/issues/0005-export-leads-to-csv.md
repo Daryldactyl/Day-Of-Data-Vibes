@@ -27,7 +27,7 @@ The hand-off is a thin adapter with injectable capabilities (`canShare` / `share
 - **Boundary** — `buildCsvFile` prepends the UTF-8 BOM (`﻿`) here, not in `toCsv`, and types the `File` `text/csv`. `defaultExportLeads(leads)` is the single hand-off extension point (clock lives here; Slice 6 adds the share branch).
 - **App** — injected `exportLeads?` prop (default `defaultExportLeads`), mirroring the `createScanner` seam; Export button beside Scan, disabled at 0 Leads. Integration tests in `App.export.test.tsx`.
 - **Verified:** 50 tests green, `tsc -b` + `npm run lint` clean. **Live Playwright QA** confirmed a real download of `day-of-data-leads-2026-06-16.csv` whose bytes start with `EF BB BF` and contain a comma-name correctly quoted, CRLF separators, and an accented name intact; Leads unchanged after export.
-- Implemented by a subagent from `docs/handoffs/2026-06-16-slice-5-export-csv-download.md`; independently inspected (re-ran suite, reviewed code, read the downloaded bytes).
+- Implemented by a subagent from `docs/handoffs/slice-5-export-csv-download.md`; independently inspected (re-ran suite, reviewed code, read the downloaded bytes).
 
 ## Blocked by
 

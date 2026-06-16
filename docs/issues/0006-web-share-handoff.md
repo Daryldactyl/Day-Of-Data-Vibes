@@ -27,7 +27,7 @@ Where Web Share for files isn't available (desktop, older browsers, local dev), 
 
 - Added `shareOrDownload(file, caps)` to `src/lib/exportCsv.ts` with injectable `canShare`/`share`/`download` (the test seam); `defaultExportLeads` now `async` and wires the real `navigator.canShare`/`navigator.share`/`downloadFile`. No App change — the `exportLeads?` seam already accepted a Promise.
 - **Verified:** 55 tests green, `tsc -b` + `npm run lint` clean. **Live Playwright QA** (stubbed Web Share) confirmed: `canShare` true → `navigator.share` called with a `File` named `day-of-data-leads-…csv`, `text/csv`, attached (not inlined); `canShare` false → download fallback fires. Cancel/non-abort paths covered by durable tests.
-- Implemented by a subagent from `docs/handoffs/2026-06-16-slice-6-web-share-handoff.md`; independently inspected (re-ran suite, reviewed the decision code, drove both live branches).
+- Implemented by a subagent from `docs/handoffs/slice-6-web-share-handoff.md`; independently inspected (re-ran suite, reviewed the decision code, drove both live branches).
 
 ## Blocked by
 

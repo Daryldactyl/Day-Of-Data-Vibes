@@ -1,6 +1,6 @@
 # Handoff — Slice 8: Badge Generator (form + Generate + on-screen QR)
 
-**Read first (verbatim):** `docs/working-agreements.md` (disciplines), `docs/issues/0008-badge-generator-on-screen-qr.md` (this slice), `docs/prd/badge-generator.md`, `docs/adr/0001-vcard-badge-payload.md`, `docs/qa-sessions/2026-06-16-badge-generator-grilling.md`, `CONTEXT.md` (glossary).
+**Read first (verbatim):** `docs/working-agreements.md` (disciplines), `docs/issues/0008-badge-generator-on-screen-qr.md` (this slice), `docs/prd/badge-generator.md`, `docs/adr/0001-vcard-badge-payload.md`, `docs/qa-sessions/badge-generator-grilling.md`, `CONTEXT.md` (glossary).
 
 Implement in a **fresh context** via `/tdd`. This is the **tracer bullet** for a new feature — a thin vertical slice through form → encode → QR render. Slice 9 (Download/Print) layers on later; do **not** build it here.
 

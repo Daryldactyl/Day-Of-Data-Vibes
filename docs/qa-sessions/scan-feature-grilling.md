@@ -1,6 +1,5 @@
 # Q&A Session — Scan Feature Grilling
 
-**Date:** 2026-06-10
 **Skill:** `/grill-with-docs`
 **Scope:** The Vendor Scan feature — tap a camera button → open the camera → scan attendee Badges (QR) → gather Leads.
 **Outcome docs:** `CONTEXT.md`, `docs/adr/0001-vcard-badge-payload.md`, `docs/adr/0002-dedupe-leads-by-email.md`

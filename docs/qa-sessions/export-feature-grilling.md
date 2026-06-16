@@ -1,6 +1,5 @@
 # Q&A Session — Export Feature Grilling
 
-**Date:** 2026-06-16
 **Skill:** `/grill-with-docs`
 **Scope:** The Vendor Export feature — a deliberate button press that builds a CSV of all collected Leads and hands it off so the Vendor can email it to their sales/recruiting team.
 **Outcome docs:** `CONTEXT.md` (Export entry sharpened), `docs/adr/0003-export-csv-web-share.md`. PRD to follow via `/to-prd`.

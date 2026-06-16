@@ -1,6 +1,6 @@
 # Handoff — Slice 7: Fix Export on desktop (download, not the broken share path)
 
-**Read first (verbatim):** `docs/working-agreements.md` (disciplines), `docs/issues/0007-export-desktop-download-fix.md` (this slice), `docs/adr/0003-export-csv-web-share.md` **(read the "Revision (2026-06-16)" section — it is the rule)**, `docs/qa-sessions/2026-06-16-export-download-bug-investigation.md` (the root-cause evidence), `CONTEXT.md` (glossary).
+**Read first (verbatim):** `docs/working-agreements.md` (disciplines), `docs/issues/0007-export-desktop-download-fix.md` (this slice), `docs/adr/0003-export-csv-web-share.md` **(read the "Revision" section — it is the rule)**, `docs/qa-sessions/export-download-bug-investigation.md` (the root-cause evidence), `CONTEXT.md` (glossary).
 
 Implement in a **fresh context** via `/tdd`. This is a **fix** layered on the already-merged Slices 5 & 6 — you are correcting one decision, not rebuilding Export.
 
@@ -106,7 +106,7 @@ See `docs/issues/0007-export-desktop-download-fix.md`. Plus `npm test` all green
 ## Disciplines (verbatim)
 `/tdd` red→green→refactor, one test at a time. Behavior through public interfaces. **Make no assumptions; the
 root cause is already proven — implement the corrected rule.** Glossary: Lead/Export/Vendor. Respect **ADR-0003
-as revised (2026-06-16)**. Report faithfully (real test output).
+as revised**. Report faithfully (real test output).
 
 ## Exact next action
 1. `npm test` → confirm 55 green baseline.

@@ -4,6 +4,22 @@ A tiny phone web app that **scans attendee QR badges and exports the leads** —
 
 ---
 
+## 🧭 New here? Pick your path
+
+**🎓 Want to learn how this was built with AI — "vibe coding, the pro way"?**
+→ **Start with the [Build Walkthrough](docs/walkthrough/index.md).**
+
+It takes you from a one-line idea to a deployed app through the *real* artifacts — the grilling sessions, the
+decision records, the sliced-up plan, the test-first code, the live QA — with **screenshots of the app
+transforming** screen by screen after each feature. Follow the same repeatable loop and you'll come out the
+other side with a great app of your own. It's the written companion to the [talk deck](slides/index.html).
+
+> New to all of this? Read it in order: the [index](docs/walkthrough/index.md) → [the repeatable loop](docs/walkthrough/02-the-repeatable-loop.md) → the three feature journeys. No prior coding required to follow the story.
+
+**🚀 Just want to run the app?** → keep reading below.
+
+---
+
 ## ▶ Run it — even if you've never coded (the easy way)
 
 You don't need to know git, React, or anything. Let **Claude Code** do the whole setup for you:
@@ -66,6 +82,7 @@ npm test
 | `src/` | the app — React + Vite + TypeScript |
 | `src/lib/vcard.ts` | the one piece of real logic (read a name + email off a QR), with tests |
 | `spec_sheet.md` | the one-page brief we build from |
+| `docs/walkthrough/` | **the build walkthrough** — idea → shipped app through the real grills, PRDs, slices, and screenshots ([start here](docs/walkthrough/index.md)) |
 | `sample-badges/` | sample QR badges to scan (open `sample-badges/index.html`) |
 | `slides/` | the meetup deck + speaker notes (for the presenter — see below) |
 

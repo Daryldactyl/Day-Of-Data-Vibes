@@ -2,8 +2,8 @@
 
 **Type:** AFK
 **PRD:** `docs/prd/export-leads-to-csv.md`
-**ADR:** `docs/adr/0003-export-csv-web-share.md` (Revision 2026-06-16)
-**Investigation:** `docs/qa-sessions/2026-06-16-export-download-bug-investigation.md`
+**ADR:** `docs/adr/0003-export-csv-web-share.md` (Revision)
+**Investigation:** `docs/qa-sessions/export-download-bug-investigation.md`
 
 ## What to build
 
@@ -41,7 +41,7 @@ The cancel (AbortError → quiet) and non-abort-share-failure (→ download) beh
       `navigator.share` asserts the **share** branch fires with the right `File`; a desktop-UA run downloads
 - [x] `npm test` all green, `tsc -b` + `npm run lint` clean
 - [x] Verified on real hardware: a phone over `npm run share` → Export → share sheet → Mail attaches the
-      CSV. **Confirmed by the Vendor on a real phone (2026-06-16)** over the Cloudflare tunnel.
+      CSV. **Confirmed by the Vendor on a real phone** over the Cloudflare tunnel.
 
 ## Implementation notes (Slice 7)
 
@@ -60,10 +60,10 @@ The cancel (AbortError → quiet) and non-abort-share-failure (→ download) beh
   **downloaded** `day-of-data-leads-2026-06-16.csv` with BOM bytes `EF BB BF`, comma-name quoted, accented
   name intact, and `navigator.share` was called **0×** (the bug fix). A UA-spoofed iPhone run took the
   **share** branch — `navigator.share` called 1× with the correct `text/csv` `File`, no download.
-- Implemented by a subagent from `docs/handoffs/2026-06-16-slice-7-export-desktop-download-fix.md`;
+- Implemented by a subagent from `docs/handoffs/slice-7-export-desktop-download-fix.md`;
   independently inspected (re-read the code, re-ran the suite/tsc/lint, drove both live Playwright branches).
-- Root cause + evidence: `docs/qa-sessions/2026-06-16-export-download-bug-investigation.md`. Rule recorded in
-  `docs/adr/0003-export-csv-web-share.md` (Revision 2026-06-16).
+- Root cause + evidence: `docs/qa-sessions/export-download-bug-investigation.md`. Rule recorded in
+  `docs/adr/0003-export-csv-web-share.md` (Revision).
 
 ## Blocked by
 
@@ -76,5 +76,5 @@ Build via **`/tdd`** (red → green → refactor, one test at a time). Follow `d
 full share/download decision matrix (inject `isMobile`/`canShare`/`share`/`download` — extend the existing
 `ShareCaps` seam in `src/lib/exportCsv.ts`), **plus** live Playwright MCP QA (real desktop download proof +
 UA-simulated mobile share). Use the `CONTEXT.md` glossary (Lead, Export, Vendor). Respect **ADR-0003 (as
-revised 2026-06-16)** — share only on confirmed mobile, download on desktop + as universal fallback.
+revised)** — share only on confirmed mobile, download on desktop + as universal fallback.
 Implement from a dedicated slice **`/handoff`** in fresh context. **Never assume; chase bugs to root cause.**

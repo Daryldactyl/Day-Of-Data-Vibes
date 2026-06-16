@@ -1,9 +1,8 @@
 # PRD — Badge Generator
 
 **Status:** ready to build
-**Date:** 2026-06-16
 **Scope:** The Badge Generator stretch feature — a secondary in-app view where you type an Attendee's name + email, tap **Generate**, and get a **Badge** (QR, vCard 3.0) rendered on screen to display or print. Lets Attendees self-serve a Badge and makes the demo self-contained (generate on one device, Scan with another).
-**Sources:** `spec_sheet.md` (§5 should-have, §7, §9), `CLAUDE.md`, `CONTEXT.md`, `docs/adr/0001-vcard-badge-payload.md`, `docs/qa-sessions/2026-06-16-badge-generator-grilling.md`
+**Sources:** `spec_sheet.md` (§5 should-have, §7, §9), `CLAUDE.md`, `CONTEXT.md`, `docs/adr/0001-vcard-badge-payload.md`, `docs/qa-sessions/badge-generator-grilling.md`
 **Vocabulary:** Uses the project glossary in `CONTEXT.md` — Attendee, Vendor, Badge, Scan, Lead, Badge Generator.
 
 ---
@@ -74,6 +73,6 @@ A quiet **"Make a badge"** link (in the footer, off the Vendor's core path) open
 ## Further Notes
 
 - This PRD is intentionally local (`docs/prd/`), matching the README, the scan and export PRDs, and the ADRs — no issue tracker is used for this project.
-- **No new ADR** — the one hard-to-reverse decision in this area (vCard 3.0 Badge payload) is already **ADR-0001**, which this feature reuses; the rest are reversible UX calls captured in `docs/qa-sessions/2026-06-16-badge-generator-grilling.md`.
+- **No new ADR** — the one hard-to-reverse decision in this area (vCard 3.0 Badge payload) is already **ADR-0001**, which this feature reuses; the rest are reversible UX calls captured in `docs/qa-sessions/badge-generator-grilling.md`.
 - **Slicing for `/to-issues`:** **0008** = footer link + view + form + Generate + on-screen QR (the tracer bullet, demoable alone); **0009** = Download (PNG) + Print layered on.
 - Build order suggestion: TDD the pure `isValidBadgeInput` + normalizer first, then the view that encodes via `encodeVCard` and renders through an injected `makeQrDataUrl`, then (Slice B) Download/Print. Verify live with Playwright MCP, including the generate → `parseVCard` round-trip.

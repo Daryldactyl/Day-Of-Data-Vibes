@@ -1,6 +1,6 @@
 # Handoff — Slice 9: Badge Generator Download (PNG) + Print
 
-**Read first (verbatim):** `docs/working-agreements.md`, `docs/issues/0009-badge-generator-download-print.md` (this slice), `docs/prd/badge-generator.md`, `docs/qa-sessions/2026-06-16-badge-generator-grilling.md`, `CONTEXT.md`.
+**Read first (verbatim):** `docs/working-agreements.md`, `docs/issues/0009-badge-generator-download-print.md` (this slice), `docs/prd/badge-generator.md`, `docs/qa-sessions/badge-generator-grilling.md`, `CONTEXT.md`.
 
 Implement in a **fresh context** via `/tdd`. Slice 8 is DONE and verified — you are layering **Download** and **Print** onto the already-rendered Badge.
 

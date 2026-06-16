@@ -6,12 +6,12 @@ Why: the goal is for a Vendor to email their collected Leads to their sales team
 
 Recorded because a future reader will see two code paths and wonder why we didn't "just download" or "just `mailto:`"; the choice is a real trade-off driven by an iOS constraint not visible in the code.
 
-## Revision (2026-06-16) — share only on mobile; desktop must download
+## Revision — share only on mobile; desktop must download
 
 The original rule above — *"share when `navigator.canShare({ files })` is true, else download"* —
 was **wrong on desktop**, and it shipped a real bug. A Vendor on a **macOS desktop browser** tapped
 Export and received a file named like a **UUID with no extension** instead of `day-of-data-leads-….csv`
-— unopenable in Excel. (See `docs/qa-sessions/2026-06-16-export-download-bug-investigation.md`.)
+— unopenable in Excel. (See `docs/qa-sessions/export-download-bug-investigation.md`.)
 
 Root cause: **`canShare` reports a _capability_, not a _device_.** Desktop macOS and Windows
 Chrome/Edge (and Safari) all answer `canShare({ files }) === true`, so a **desktop** Vendor was routed

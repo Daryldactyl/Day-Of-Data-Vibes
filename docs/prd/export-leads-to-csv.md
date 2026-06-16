@@ -1,9 +1,8 @@
 # PRD — Export Leads to CSV
 
 **Status:** ready to build
-**Date:** 2026-06-16
 **Scope:** The Vendor's Export feature — tap a button → build a CSV of all collected Leads → hand it off (native share sheet on a phone, file download on desktop) so the Vendor can email it to their sales/recruiting team.
-**Sources:** `spec_sheet.md` (§4.5, §5, §6, §9), `CONTEXT.md`, `docs/adr/0003-export-csv-web-share.md`, `docs/qa-sessions/2026-06-16-export-feature-grilling.md`
+**Sources:** `spec_sheet.md` (§4.5, §5, §6, §9), `CONTEXT.md`, `docs/adr/0003-export-csv-web-share.md`, `docs/qa-sessions/export-feature-grilling.md`
 **Vocabulary:** Uses the project glossary in `CONTEXT.md` — Attendee, Vendor, Badge, Scan, Lead, Export.
 
 ---
@@ -85,5 +84,5 @@ The Home screen gains an **Export** button next to **Scan**. When the Vendor has
 ## Further Notes
 
 - This PRD is intentionally local (`docs/prd/`), matching the README, the scan PRD, and the ADRs — no issue tracker is used for this project.
-- The one hard-to-reverse decision (Web Share with download fallback, and the rejection of `mailto:`) is recorded as **ADR-0003**; the full grilling transcript, including the conventional choices adopted without live debate (empty-state, filename, ordering, encoding), is in `docs/qa-sessions/2026-06-16-export-feature-grilling.md`.
+- The one hard-to-reverse decision (Web Share with download fallback, and the rejection of `mailto:`) is recorded as **ADR-0003**; the full grilling transcript, including the conventional choices adopted without live debate (empty-state, filename, ordering, encoding), is in `docs/qa-sessions/export-feature-grilling.md`.
 - Build order suggestion: TDD the pure `toCsv` first (RFC-4180 quoting is the heart), then `exportFilename`, then the BOM/`File` assembly + injectable share/download adapter, then the Home Export button (disabled at 0 Leads) on top. Verify live with Playwright MCP (download path on desktop; assert the share path via an injected/stubbed `navigator.share`) and, on real hardware, the share sheet → Mail attachment over the `npm run share` tunnel.

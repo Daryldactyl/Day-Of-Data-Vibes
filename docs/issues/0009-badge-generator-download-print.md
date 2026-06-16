@@ -49,7 +49,7 @@ Both buttons appear only when a Badge has been generated (Slice 8). No change to
   Generate, Download + Print appear; **Download fired a real PNG** named `day-of-data-badge-o-brien-pat.png`
   (typed `"O'Brien, Pat"` — apostrophe/comma/space slugified correctly); **Print** fired the spied `window.print`
   once. Buttons absent before generation.
-- Implemented by a subagent from `docs/handoffs/2026-06-16-slice-9-badge-generator-download-print.md`;
+- Implemented by a subagent from `docs/handoffs/slice-9-badge-generator-download-print.md`;
   independently inspected (re-read code + `@media print` CSS, re-ran suite/tsc/lint, drove live PNG-download +
   print-spy QA).
 

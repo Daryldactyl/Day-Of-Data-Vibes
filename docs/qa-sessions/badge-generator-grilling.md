@@ -1,4 +1,4 @@
-# Grill session — Badge Generator (2026-06-16)
+# Grill session — Badge Generator
 
 > `/grill-with-docs` over the **Badge Generator** stretch feature (spec_sheet.md §5/§7, CLAUDE.md).
 > Resolved against `CONTEXT.md` and the ADRs; one decision at a time, each with a recommendation.
