@@ -94,6 +94,24 @@
   font-size: 0.82rem;
   text-align: center;
   font-family: ui-monospace, Consolas, monospace;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.make-badge-link {
+  background: none;
+  border: none;
+  color: #a8f0f4;
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+}
+
+.foot-glossary {
+  color: #6b8a99;
 }
 
 /* --- Home action buttons (Scan / Export) --- */
@@ -246,4 +264,166 @@
   border: none;
   border-radius: 10px;
   cursor: pointer;
+}
+
+/* --- Full-screen Badge Generator --- */
+.badge-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  background: #142430;
+  color: #fff5eb;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.badge-hud {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px;
+  padding-top: max(16px, env(safe-area-inset-top));
+  border-bottom: 1px solid #2d4a5a;
+}
+
+.badge-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #a8f0f4;
+}
+
+.badge-done {
+  padding: 10px 20px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0c1a22;
+  background: #fff5eb;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.badge-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px 20px;
+  max-width: 26rem;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.badge-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-weight: 600;
+}
+
+.badge-field input {
+  padding: 12px 14px;
+  font-size: 1.05rem;
+  color: #fff5eb;
+  background: #1b3240;
+  border: 1px solid #2d4a5a;
+  border-radius: 10px;
+}
+
+.badge-generate {
+  padding: 16px;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #0c1a22;
+  background: #4ad6c4;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.badge-generate:disabled {
+  background: #2a3a42;
+  color: #5e6e76;
+  cursor: not-allowed;
+}
+
+.badge-hint {
+  margin: 0;
+  text-align: center;
+  color: #6b8a99;
+}
+
+.badge-result {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.badge-qr {
+  width: 280px;
+  max-width: 80vw;
+  height: auto;
+  background: #fff;
+  padding: 12px;
+  border-radius: 12px;
+}
+
+.badge-name {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.badge-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.badge-download,
+.badge-print {
+  font: inherit;
+  font-weight: 600;
+  padding: 10px 18px;
+  border-radius: 10px;
+  border: 1px solid #e89a4a;
+  background: #e89a4a;
+  color: #142430;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* Print only the generated Badge (QR + name), never the app chrome. Hide
+ * everything, then reveal just the Badge result — minus its action buttons. */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  .badge-result,
+  .badge-result * {
+    visibility: visible;
+  }
+
+  .badge-overlay {
+    position: static;
+    background: #fff;
+    color: #000;
+    overflow: visible;
+  }
+
+  .badge-result {
+    position: absolute;
+    inset: 0;
+    margin: auto;
+  }
+
+  .badge-actions {
+    display: none;
+  }
+
+  .badge-qr {
+    background: #fff;
+    padding: 0;
+  }
 }

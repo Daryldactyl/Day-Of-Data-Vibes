@@ -5,17 +5,26 @@ import type { Lead } from './lib/leads'
 import { ScanOverlay } from './ScanOverlay'
 import type { CreateScanner } from './scanner'
 import { defaultExportLeads } from './lib/exportCsv'
+import { BadgeGenerator } from './BadgeGenerator'
+import { defaultMakeQrDataUrl, type MakeQrDataUrl } from './badgeQr'
 
 interface AppProps {
   /** Inject a fake scanner in tests; defaults to the real camera scanner. */
   createScanner?: CreateScanner
   /** Inject a fake Export in tests; defaults to the real CSV download. */
   exportLeads?: (leads: Lead[]) => void | Promise<void>
+  /** Inject a fake QR generator in tests; defaults to the real qrcode call. */
+  makeQrDataUrl?: MakeQrDataUrl
 }
 
-export default function App({ createScanner, exportLeads = defaultExportLeads }: AppProps = {}) {
+export default function App({
+  createScanner,
+  exportLeads = defaultExportLeads,
+  makeQrDataUrl = defaultMakeQrDataUrl,
+}: AppProps = {}) {
   const [leads, setLeads] = useState<Lead[]>(() => loadLeads())
   const [scanning, setScanning] = useState(false)
+  const [makingBadge, setMakingBadge] = useState(false)
 
   return (
     <main className="app">
@@ -63,7 +72,14 @@ export default function App({ createScanner, exportLeads = defaultExportLeads }:
       </div>
 
       <footer className="foot">
-        Attendee · Vendor · Badge · Scan · Lead · Export
+        <button
+          className="make-badge-link"
+          type="button"
+          onClick={() => setMakingBadge(true)}
+        >
+          Make a badge
+        </button>
+        <span className="foot-glossary">Attendee · Vendor · Badge · Scan · Lead · Export</span>
       </footer>
 
       {scanning ? (
@@ -73,6 +89,10 @@ export default function App({ createScanner, exportLeads = defaultExportLeads }:
           onDone={() => setScanning(false)}
           createScanner={createScanner}
         />
+      ) : null}
+
+      {makingBadge ? (
+        <BadgeGenerator onDone={() => setMakingBadge(false)} makeQrDataUrl={makeQrDataUrl} />
       ) : null}
     </main>
   )
