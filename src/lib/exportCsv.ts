@@ -48,22 +48,47 @@ export function downloadFile(file: File): void {
   document.body.appendChild(anchor)
   anchor.click()
   anchor.remove()
-  URL.revokeObjectURL(url)
+  // Defer the revoke past the click: an immediate, synchronous revoke can
+  // truncate the download on Safari/Firefox (the browser may still be reading
+  // the object URL). Download is now the primary desktop path (ADR-0003
+  // Revision 2026-06-16), so this matters.
+  setTimeout(() => URL.revokeObjectURL(url), 0)
+}
+
+/** Minimal navigator shape `isMobileDevice` reads — injected so the predicate
+ *  is unit-testable against UA fixtures without a real navigator. */
+export interface NavLike {
+  userAgent: string
+  // `mobile` is the User-Agent Client Hints signal. The DOM lib's
+  // `NavigatorUAData` type does not (yet) declare it, so accept any extra
+  // properties and read `mobile` defensively — keeps `navigator` assignable.
+  userAgentData?: { mobile?: boolean } & Record<string, unknown>
+}
+
+/** Conservative "is this a phone?" predicate (ADR-0003 Revision 2026-06-16).
+ *  True only for Android Chromium (`userAgentData.mobile === true`) or an
+ *  iPhone/iPod UA. macOS, Windows, Linux, iPad, and Android tablets all → false
+ *  (→ download). Uncertainty fails toward download. */
+export function isMobileDevice(nav: NavLike): boolean {
+  return nav.userAgentData?.mobile === true || /iPhone|iPod/i.test(nav.userAgent)
 }
 
 /** Injectable share/download capabilities so the hand-off decision is unit-
  *  testable without a real share sheet (mirrors the createScanner/diagnoseCamera
  *  injection pattern). */
 export interface ShareCaps {
+  isMobile: () => boolean
   canShare: (file: File) => boolean
   share: (file: File) => Promise<void>
   download: (file: File) => void
 }
 
-/** Hand off the CSV File: open the native share sheet when supported, else fall
- *  back to download (ADR-0003). */
+/** Hand off the CSV File: open the native share sheet ONLY on a confirmed mobile
+ *  device that can share files; otherwise download (ADR-0003 Revision 2026-06-16).
+ *  `canShare` is a capability, not a device — desktop reports it `true` but must
+ *  download. Uncertainty fails toward download. */
 export async function shareOrDownload(file: File, caps: ShareCaps): Promise<void> {
-  if (caps.canShare(file)) {
+  if (caps.isMobile() && caps.canShare(file)) {
     try {
       await caps.share(file)
     } catch (err) {
@@ -84,6 +109,7 @@ export async function shareOrDownload(file: File, caps: ShareCaps): Promise<void
 export async function defaultExportLeads(leads: Lead[]): Promise<void> {
   const file = buildCsvFile(leads, new Date())
   await shareOrDownload(file, {
+    isMobile: () => isMobileDevice(navigator),
     canShare: (f) => !!navigator.canShare && navigator.canShare({ files: [f] }),
     share: (f) => navigator.share({ files: [f] }),
     download: downloadFile,

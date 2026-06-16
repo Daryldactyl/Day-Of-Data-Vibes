@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { toCsv, exportFilename, buildCsvFile, shareOrDownload } from './exportCsv'
+import { toCsv, exportFilename, buildCsvFile, shareOrDownload, isMobileDevice } from './exportCsv'
 import type { Lead } from './leads'
 
 describe('toCsv', () => {
@@ -64,22 +64,87 @@ describe('exportFilename', () => {
   })
 })
 
+describe('isMobileDevice', () => {
+  it('is true for an iPhone Safari user agent', () => {
+    const nav = {
+      userAgent:
+        'Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1',
+    }
+    expect(isMobileDevice(nav)).toBe(true)
+  })
+
+  it('is true for Android Chromium reporting userAgentData.mobile === true', () => {
+    const nav = {
+      // UA-CH can leave the UA string desktop-ish; the mobile signal is the hint.
+      userAgent:
+        'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36',
+      userAgentData: { mobile: true },
+    }
+    expect(isMobileDevice(nav)).toBe(true)
+  })
+
+  it('is false for a macOS desktop user agent (the reported-bug platform)', () => {
+    const nav = {
+      userAgent:
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Safari/605.1.15',
+    }
+    expect(isMobileDevice(nav)).toBe(false)
+  })
+
+  it('is false for Windows, Linux, iPad, and Android-tablet user agents', () => {
+    const windows = {
+      userAgent:
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+      userAgentData: { mobile: false },
+    }
+    const linux = {
+      userAgent:
+        'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+      userAgentData: { mobile: false },
+    }
+    // iPad Safari reports a Mac UA and no mobile hint → treated as desktop.
+    const ipad = {
+      userAgent:
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Safari/605.1.15',
+    }
+    // Android tablet: Chromium sets the mobile hint to false on tablets.
+    const androidTablet = {
+      userAgent:
+        'Mozilla/5.0 (Linux; Android 13; SM-X710) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+      userAgentData: { mobile: false },
+    }
+    expect(isMobileDevice(windows)).toBe(false)
+    expect(isMobileDevice(linux)).toBe(false)
+    expect(isMobileDevice(ipad)).toBe(false)
+    expect(isMobileDevice(androidTablet)).toBe(false)
+  })
+})
+
 describe('shareOrDownload', () => {
   const file = new File(['x'], 'day-of-data-leads-2026-06-16.csv', { type: 'text/csv' })
 
-  it('shares the File when canShare is true; does not download', async () => {
+  it('shares the File when isMobile and canShare are both true; does not download', async () => {
     const share = vi.fn().mockResolvedValue(undefined)
     const download = vi.fn()
-    await shareOrDownload(file, { canShare: () => true, share, download })
+    await shareOrDownload(file, { isMobile: () => true, canShare: () => true, share, download })
     expect(share).toHaveBeenCalledTimes(1)
     expect(share).toHaveBeenCalledWith(file)
     expect(download).not.toHaveBeenCalled()
   })
 
-  it('downloads the File when canShare is false; does not share', async () => {
+  it('downloads (does not share) on desktop even when canShare is true (the bug fix)', async () => {
     const share = vi.fn().mockResolvedValue(undefined)
     const download = vi.fn()
-    await shareOrDownload(file, { canShare: () => false, share, download })
+    await shareOrDownload(file, { isMobile: () => false, canShare: () => true, share, download })
+    expect(download).toHaveBeenCalledTimes(1)
+    expect(download).toHaveBeenCalledWith(file)
+    expect(share).not.toHaveBeenCalled()
+  })
+
+  it('downloads on mobile when canShare is false; does not share', async () => {
+    const share = vi.fn().mockResolvedValue(undefined)
+    const download = vi.fn()
+    await shareOrDownload(file, { isMobile: () => true, canShare: () => false, share, download })
     expect(download).toHaveBeenCalledTimes(1)
     expect(download).toHaveBeenCalledWith(file)
     expect(share).not.toHaveBeenCalled()
@@ -91,7 +156,7 @@ describe('shareOrDownload', () => {
     )
     const download = vi.fn()
     await expect(
-      shareOrDownload(file, { canShare: () => true, share, download }),
+      shareOrDownload(file, { isMobile: () => true, canShare: () => true, share, download }),
     ).resolves.toBeUndefined()
     expect(download).not.toHaveBeenCalled()
   })
@@ -100,7 +165,7 @@ describe('shareOrDownload', () => {
     const share = vi.fn().mockRejectedValue(new Error('share unavailable'))
     const download = vi.fn()
     await expect(
-      shareOrDownload(file, { canShare: () => true, share, download }),
+      shareOrDownload(file, { isMobile: () => true, canShare: () => true, share, download }),
     ).resolves.toBeUndefined()
     expect(download).toHaveBeenCalledTimes(1)
     expect(download).toHaveBeenCalledWith(file)
@@ -112,7 +177,7 @@ describe('shareOrDownload', () => {
     ]
     const csv = buildCsvFile(leads, new Date('2026-06-16T10:00:00'))
     const share = vi.fn().mockResolvedValue(undefined)
-    await shareOrDownload(csv, { canShare: () => true, share, download: vi.fn() })
+    await shareOrDownload(csv, { isMobile: () => true, canShare: () => true, share, download: vi.fn() })
     const shared = share.mock.calls[0][0] as File
     expect(shared.name).toBe('day-of-data-leads-2026-06-16.csv')
     expect(shared.type).toBe('text/csv')
