@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { handleScan, type ScanNotification } from './lib/scan'
+import { handleScan, isFreshScan, type LastDecode, type ScanNotification } from './lib/scan'
 import { saveLeads } from './lib/leadsStorage'
 import type { Lead } from './lib/leads'
 import { defaultCreateScanner, diagnoseCamera as defaultDiagnoseCamera, type CreateScanner } from './scanner'
@@ -11,6 +11,11 @@ interface Toast {
 }
 
 const TOAST_MS = 1800
+// A Badge held in front of the camera re-decodes every frame; treat the same
+// Badge seen again within this window as the same continuous Scan (count once,
+// keep the confirmation). A longer gap means it left the frame and was
+// re-presented — a deliberate rescan, which does show "Already saved".
+const SCAN_GAP_MS = 1500
 
 interface ScanOverlayProps {
   leads: Lead[]
@@ -30,6 +35,9 @@ export function ScanOverlay({
   const videoRef = useRef<HTMLVideoElement>(null)
   const startCameraRef = useRef<() => void>(() => {})
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  // The last decode we acted on, so qr-scanner's per-frame re-decodes of a Badge
+  // held in view collapse to one Scan (see isFreshScan).
+  const lastDecode = useRef<LastDecode | null>(null)
   // Refs so the scanner's long-lived onDecode closure always sees current state.
   const leadsRef = useRef(leads)
   const onLeadsChangeRef = useRef(onLeadsChange)
@@ -42,7 +50,17 @@ export function ScanOverlay({
   const [error, setError] = useState<CameraErrorInfo | null>(null)
 
   function onDecodedText(rawQrText: string) {
-    const result = handleScan(leadsRef.current, rawQrText, new Date().toISOString())
+    // qr-scanner fires this every frame a Badge is in view. Ignore the repeats
+    // of a Badge still being held so its confirmation isn't instantly replaced
+    // by "Already saved"; only act on a fresh Scan (new Badge, or a re-presented
+    // one after it left the frame).
+    const decodedAt = new Date()
+    const now = decodedAt.getTime()
+    const fresh = isFreshScan(lastDecode.current, rawQrText, now, SCAN_GAP_MS)
+    lastDecode.current = { key: rawQrText, at: now }
+    if (!fresh) return
+
+    const result = handleScan(leadsRef.current, rawQrText, decodedAt.toISOString())
     if (result.notification === 'saved' || result.notification === 'duplicate') {
       const name = result.contact?.name ?? ''
       if (result.notification === 'saved') {

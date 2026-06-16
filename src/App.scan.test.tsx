@@ -42,7 +42,7 @@ describe('Scan flow', () => {
     await vi.waitFor(() => expect(fake.scanner.start).toHaveBeenCalled())
   })
 
-  it('saves a new Lead, dedupes a re-scan, and ignores a non-Badge — then returns to the list', () => {
+  it('saves a new Lead, holds a Badge kept in view to one save, and ignores a non-Badge — then returns to the list', () => {
     const fake = makeFakeScanner()
     render(<App createScanner={fake.create} />)
     fireEvent.click(screen.getByRole('button', { name: 'Scan' }))
@@ -52,12 +52,14 @@ describe('Scan flow', () => {
     expect(screen.getByTestId('scan-toast')).toHaveTextContent('Saved: Ada Lovelace')
     expect(screen.getByTestId('scan-lead-count')).toHaveTextContent('1 lead')
 
-    // Same Badge again → already saved, no new row
+    // Same Badge re-decoded immediately (still in view) → held to one save: the
+    // confirmation stays, no instant "Already saved", no new row. (Deliberate
+    // re-presentation after a gap is covered in ScanOverlay.debounce.test.tsx.)
     fake.scan(badge('Ada Lovelace', 'ada@dayofdata.example'))
-    expect(screen.getByTestId('scan-toast')).toHaveTextContent('Already saved: Ada Lovelace')
+    expect(screen.getByTestId('scan-toast')).toHaveTextContent('Saved: Ada Lovelace')
     expect(screen.getByTestId('scan-lead-count')).toHaveTextContent('1 lead')
 
-    // Junk QR → not a badge, no new row
+    // Junk QR (a different code) → not a badge, no new row
     fake.scan('https://example.com/poster')
     expect(screen.getByTestId('scan-toast')).toHaveTextContent('Not a badge')
     expect(screen.getByTestId('scan-lead-count')).toHaveTextContent('1 lead')

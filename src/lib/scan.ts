@@ -22,3 +22,21 @@ export function handleScan(leads: Lead[], rawQrText: string, scannedAt: string):
   const { leads: nextLeads, status } = addLead(leads, contact, scannedAt)
   return { leads: nextLeads, notification: status, contact }
 }
+
+/** The last decode the overlay acted on — the raw QR text plus when (ms epoch). */
+export interface LastDecode {
+  key: string
+  at: number
+}
+
+/** qr-scanner re-decodes a Badge held in front of the camera every frame, so one
+ *  physical Scan fires the decode callback many times. Decide whether a decode is
+ *  a *distinct* Scan worth acting on, vs the same Badge still being held (which
+ *  must count once). Fresh when it's a different Badge, or the same Badge
+ *  reappearing after a gap longer than `gapMs` — i.e. it left the frame and was
+ *  re-presented, a deliberate rescan. */
+export function isFreshScan(last: LastDecode | null, key: string, now: number, gapMs: number): boolean {
+  if (last === null) return true
+  if (last.key !== key) return true
+  return now - last.at > gapMs
+}

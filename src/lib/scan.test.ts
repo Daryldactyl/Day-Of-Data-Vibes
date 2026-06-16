@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { handleScan } from './scan'
+import { handleScan, isFreshScan } from './scan'
 import { encodeVCard } from './vcard'
 import type { Lead } from './leads'
 
@@ -42,5 +42,25 @@ describe('handleScan', () => {
 
     const notBadge = handleScan([], 'just text', '2026-06-10T16:00:00.000Z')
     expect(notBadge.contact).toBeNull()
+  })
+})
+
+describe('isFreshScan', () => {
+  const GAP = 1500
+
+  it('treats the very first decode as fresh', () => {
+    expect(isFreshScan(null, 'A', 1000, GAP)).toBe(true)
+  })
+
+  it('treats a different Badge as fresh', () => {
+    expect(isFreshScan({ key: 'A', at: 1000 }, 'B', 1010, GAP)).toBe(true)
+  })
+
+  it('ignores the same Badge re-decoded within the gap (still held in view)', () => {
+    expect(isFreshScan({ key: 'A', at: 1000 }, 'A', 1200, GAP)).toBe(false)
+  })
+
+  it('treats the same Badge re-presented after the gap as fresh (a deliberate rescan)', () => {
+    expect(isFreshScan({ key: 'A', at: 1000 }, 'A', 3000, GAP)).toBe(true)
   })
 })
