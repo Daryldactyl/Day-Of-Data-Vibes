@@ -37,6 +37,20 @@ npm run share   # prints a https://….trycloudflare.com link
 
 Open that link on your phone. On **iPhone, open it in the Safari tab** (not "Add to Home Screen") — the camera only works in the tab.
 
+> The `npm run share` link is a **temporary tunnel through your laptop** — good for a quick phone test, but it only works while your machine is on and running `npm run dev`. For a permanent link many vendors can use at once, deploy it (below).
+
+## 🌍 Deploy it — a permanent link for vendors
+
+The app is **live at https://day-of-data-vibes.pages.dev/** (Cloudflare Pages). This is **real hosting on Cloudflare's CDN — not a tunnel** — so the link works whether or not your computer is on, and any number of vendors can use it at the same time. (There's no server or shared database: each vendor's phone keeps its own Leads in its own browser, so it scales for free.)
+
+To publish a new version after changes:
+
+```bash
+npm run deploy   # builds the app and uploads it to Cloudflare Pages
+```
+
+First time only, log in once: `npx wrangler login` (opens your browser → **Allow**).
+
 ## Run the tests
 
 ```bash
