@@ -18,7 +18,7 @@ A QR code encoding an Attendee's name and email, worn by the Attendee.
 A Vendor capturing a Badge with the phone camera. One successful Scan reads a Badge and yields a Lead.
 
 **Lead**:
-A captured Attendee record — name, email, and the timestamp of the Scan — in a Vendor's list. Synonymous with the contact a Vendor walks away with. A Vendor's list holds at most one Lead per Attendee, identified by email (normalized); re-scanning an Attendee already in the list does not add a row.
+A captured Attendee record — name, email, and the timestamp of the Scan — in a Vendor's list. Synonymous with the contact a Vendor walks away with. A Vendor holds at most one Lead per Attendee, identified by email (normalized); re-scanning an Attendee the Vendor has **already captured — whether the Lead is active or archived** — does not add a row.
 _Avoid_: Contact (use Lead in code and UI).
 
 **Export**:
@@ -32,3 +32,6 @@ A Vendor-triggered draw that picks one collected Lead at random as the prize win
 
 **Merge** _(should-have)_:
 Combining another Vendor's collected Leads into your own list, so several phones at one booth can finish with one combined list. One Vendor imports a teammate's Leads and they are de-duplicated by email the same way a single list already is (existing Leads win; new ones are added with their original scan time). Peer-to-peer and on-device — no central store — and non-destructive (import only ever adds).
+
+**Active Lead** / **Archived Lead** _(should-have)_:
+A Vendor's Leads are either **active** — shown on Home and the only Leads that Export, Raffle, and a Merge handoff act on — or **archived**: Leads the Vendor has deliberately handed off to a teammate and set aside. An archived Lead is hidden from the active list (so it isn't shown, exported, raffled, or re-shared) but is **retained**: the Attendee still counts as already-scanned (and so can never be re-scanned), and the Vendor can restore archived Leads to active ("clear shared"). Archiving is always a deliberate, reversible Vendor action — never automatic.

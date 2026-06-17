@@ -81,6 +81,22 @@ by re-reading and re-running the subagents' "green" work, both fixed test-first.
 grill's "~20–25 Leads per QR" was **too dense to scan** (1,881 bytes); measuring it (then refusing to trust a
 flaky headless proxy) drove the codes down to ~9/chunk at a larger render — to be confirmed on real phones.
 
+## A feature the *build* surfaced — consolidation (round 2.5)
+
+The best evidence that the loop is alive: **building** the basic Merge surfaced the *next* feature. Once Leads
+could hop phone-to-phone in small QR codes, the Vendor realized they'd consolidate *throughout the day*, not in
+one end-of-day dump — which raised a sharp question: *if I hand a batch off and it leaves my list, how do I still
+never re-scan those people?*
+
+So we grilled it (the [consolidation session](../qa-sessions/consolidation-grilling.md)). The crux: today the
+active Leads list *is* the dedup index — so we **split it in two**: **active** Leads (what Home, Export, Raffle,
+and a handoff act on) and **archived** Leads (handed off, hidden, but retained), with **dedup spanning the union**
+so an archived Attendee can never be re-captured. Archiving is deliberate and reversible (chunked QR has no
+delivery confirmation, so auto-archiving could silently lose Leads); **Restore** brings a batch back. It's a
+genuine data-model change — recorded as **[ADR-0005](../adr/0005-active-archived-lead-lifecycle.md)**, which
+**revises [ADR-0002](../adr/0002-dedupe-leads-by-email.md)** (the dedup scope) and lands in **`spec_sheet.md`
+§10.4**. It's designed and queued to build next, through the same loop.
+
 ## What this chapter teaches
 
 - **The loop is for maintenance, not just launch.** Grill → record → PRD → slice → TDD → QA works the same on a
@@ -93,6 +109,6 @@ flaky headless proxy) drove the codes down to ~9/chunk at a larger render — to
 ---
 
 *Round two shipped through the same loop that wrote this chapter — Raffle and the basic Merge are built, tested,
-and inspected; the consolidation idea it sparked (archive a handed-off batch while keeping the never-re-scan
-guarantee) is the next grill. The method is the constant; the features just keep coming.* Start over from
-**[the index](index.md)**, or open [`slides/index.html`](../../slides/index.html) and give the talk.
+and inspected; the consolidation idea the build itself sparked is grilled, designed (ADR-0005), and queued to
+build next. The method is the constant; the features just keep coming.* Start over from **[the index](index.md)**,
+or open [`slides/index.html`](../../slides/index.html) and give the talk.

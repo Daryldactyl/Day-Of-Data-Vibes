@@ -94,3 +94,14 @@ Multiple staff often work one sponsor table, each scanning on their own phone. T
 
 ### 10.3 Deliberately declined — a central shared database *(won't have)*
 Andy also floated a central database of names so every phone at a table sees one shared list. **Declined for now** (likely indefinitely): it means a server plus the **PII responsibilities** of storing attendee contacts centrally — exactly what the URL-first, local-only design exists to avoid. §10.2's peer-to-peer merge is the chosen alternative: it solves the same multi-phone need *without* the central store. Recorded here so the "why not just a database?" question has a standing answer.
+
+### 10.4 Consolidate throughout the day — active vs archived Leads *(should-have)*
+**Source:** Once the basic Merge (§10.2) shipped, its small per-code chunks made it natural to consolidate *incrementally* — hand off a batch to a teammate now and then, not in one end-of-day dump. The Vendor's follow-on ask, grilled into the design below.
+
+When a Vendor hands a batch of Leads to a teammate, those Leads should leave the Vendor's working list so they aren't shown, exported, raffled, or re-shared again — **while preserving the hard rule that an Attendee already scanned can never be re-scanned**, even after being handed off. Resolved (see **`docs/adr/0005-active-archived-lead-lifecycle.md`** and the **ADR-0002 revision**):
+
+- A Vendor's Leads are either **active** (on Home; the only Leads Export, Raffle, and a Merge handoff act on) or **archived** (handed off, hidden, but retained).
+- **Dedup spans active ∪ archived** for both Scan and import — so an archived Attendee still can't be re-captured.
+- **Archiving is a deliberate, reversible action** (the Vendor explicitly archives the active list *after* confirming the handoff landed — chunked QR has no delivery confirmation, so auto-archiving could silently lose Leads).
+- **Restore** brings *all* archived Leads back to active in one non-destructive move (to re-share to a different teammate, or recover a missed handoff).
+- **No data-wipe** in this round — Restore only *moves* Leads, never deletes (consistent with §5's "no delete in v1").
