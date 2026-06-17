@@ -53,12 +53,33 @@ draw logic gets TDD'd; the *feel* of the reel gets a `/prototype`.
 **Merge a teammate's list.** This is the answer to Andy's multi-phone observation — and a small case study in a
 grill *not* taking the easy recommendation. The cheapest path was a file/AirDrop import (Export already builds
 the shareable file). The user chose the richer one anyway: **chunked QR** — the sender shows a scrollable stack
-of QR codes (the list split into ~20–25-Lead chunks), the receiver scans them with a progress count, and the
+of QR codes (the list split into small per-code chunks), the receiver scans them with a progress count, and the
 app merges via the *existing* email dedup ([ADR-0002](../adr/0002-dedupe-leads-by-email.md)). It's deliberately
 **peer-to-peer with no central store** — solving the multi-phone problem *without* the database Andy worried
 about. That trade-off (and the honest note that we chose against the lower-effort file route) is recorded in
 **[ADR-0004](../adr/0004-merge-lists-chunked-qr.md)**. The glossary ([`CONTEXT.md`](../../CONTEXT.md)) gained
 **Raffle** and **Merge** the moment each was pinned.
+
+## What shipped — the transformation
+
+Both features went out as tracer-bullet slices (issues
+[0010–0014](../issues/0010-raffle-draw-and-reveal.md)), each built by a fresh subagent from a focused hand-off
+and then **independently and adversarially inspected** — which is where round two really earned the disciplines:
+
+- The **Raffle** is a fair, uniform draw (`pickWinner` decides the winner *first*) wrapped in a gamified vertical
+  name-reel — the feel tuned in a throwaway `/prototype`, the winner provably immune to the animation.
+
+  ![Raffle — the name reel landing on a winner](images/05-raffle-reel.png)
+
+- **Merge** turns your list into a scrollable stack of QR codes a teammate scans to combine lists, peer-to-peer.
+
+  ![Merge — "Show my list as codes"](images/06-merge-sender-codes.png)
+
+Two adversarial catches in this round are the lesson in miniature: a pure `reassembleChunks([])` that **crashed**
+on empty input, and a receiver whose camera `start()` **floated its rejection** with no error UI — both surfaced
+by re-reading and re-running the subagents' "green" work, both fixed test-first. And the live QA found that the
+grill's "~20–25 Leads per QR" was **too dense to scan** (1,881 bytes); measuring it (then refusing to trust a
+flaky headless proxy) drove the codes down to ~9/chunk at a larger render — to be confirmed on real phones.
 
 ## What this chapter teaches
 
@@ -71,7 +92,7 @@ about. That trade-off (and the honest note that we chose against the lower-effor
 
 ---
 
-*Round two is being built via the same loop as it's written — the PRDs, slices, and the transformation
-screenshots for Raffle and Merge land here as each ships. The method is the constant; the features just keep
-coming.* Start over from **[the index](index.md)**, or open [`slides/index.html`](../../slides/index.html) and
-give the talk.
+*Round two shipped through the same loop that wrote this chapter — Raffle and the basic Merge are built, tested,
+and inspected; the consolidation idea it sparked (archive a handed-off batch while keeping the never-re-scan
+guarantee) is the next grill. The method is the constant; the features just keep coming.* Start over from
+**[the index](index.md)**, or open [`slides/index.html`](../../slides/index.html) and give the talk.
