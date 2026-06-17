@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import './App.css'
 import { loadLeads, loadArchived, saveLeads, saveArchived } from './lib/leadsStorage'
-import { archiveAll } from './lib/leads'
+import { archiveAll, restoreAll } from './lib/leads'
 import type { Lead } from './lib/leads'
 import { ScanOverlay } from './ScanOverlay'
 import type { CreateScanner } from './scanner'
@@ -58,6 +58,18 @@ export default function App({
     saveLeads(next.active)
     saveArchived(next.archived)
     setSharingList(false)
+  }
+
+  // Restore (ADR-0005): move ALL archived Leads back into active in one tap,
+  // persist BOTH stores. Symmetric to handleArchive and non-destructive — Leads
+  // only move buckets, nothing is deleted. Afterward Home shows the restored
+  // Leads, the archived count returns to 0, and Export/Raffle/Share see them.
+  function handleRestore() {
+    const next = restoreAll(leads, archived)
+    setLeads(next.active)
+    setArchived(next.archived)
+    saveLeads(next.active)
+    saveArchived(next.archived)
   }
 
   return (
@@ -137,6 +149,14 @@ export default function App({
           >
             Import a list
           </button>
+          {archived.length > 0 ? (
+            <span className="archived-restore" data-testid="archived-count">
+              {archived.length} archived
+              <button className="restore-link" type="button" onClick={handleRestore}>
+                Restore
+              </button>
+            </span>
+          ) : null}
         </div>
         <span className="foot-glossary">Attendee · Vendor · Badge · Scan · Lead · Export</span>
       </footer>

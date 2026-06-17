@@ -15,15 +15,15 @@ the dedup memory (no data-wipe this round).
 
 ## Acceptance criteria
 
-- [ ] An archived-count affordance shows **N** when there are archived Leads, and is hidden/absent at **0** archived.
-- [ ] Tapping **Restore** moves **all** archived Leads → active (`restoreAll`), persists **both** stores; Home then
+- [x] An archived-count affordance shows **N** when there are archived Leads, and is hidden/absent at **0** archived.
+- [x] Tapping **Restore** moves **all** archived Leads → active (`restoreAll`), persists **both** stores; Home then
       shows the restored Leads, the archived count returns to 0, and Export/Raffle include them again.
-- [ ] Restore is **non-destructive** — no Lead lost or duplicated, `scannedAt` preserved. **No** action erases
+- [x] Restore is **non-destructive** — no Lead lost or duplicated, `scannedAt` preserved. **No** action erases
       Leads or clears the dedup memory (no data-wipe).
-- [ ] Durable RTL tests: the count shows when archived is non-empty; **Restore** moves archived→active and persists
+- [x] Durable RTL tests: the count shows when archived is non-empty; **Restore** moves archived→active and persists
       both stores; round-trip with archive (Slice 16) is lossless. A live Playwright MCP QA pass: with archived
       seeded, Restore brings the list back to Home.
-- [ ] `npm test` all green, `tsc -b` + `npm run lint` clean.
+- [x] `npm test` all green, `tsc -b` + `npm run lint` clean.
 
 ## Blocked by
 
