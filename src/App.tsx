@@ -8,6 +8,8 @@ import { defaultExportLeads } from './lib/exportCsv'
 import { BadgeGenerator } from './BadgeGenerator'
 import { defaultMakeQrDataUrl, type MakeQrDataUrl } from './badgeQr'
 import { RaffleOverlay } from './RaffleOverlay'
+import { ShareListView } from './ShareListView'
+import { defaultMakeTransferId, type MakeTransferId } from './transferId'
 
 interface AppProps {
   /** Inject a fake scanner in tests; defaults to the real camera scanner. */
@@ -18,6 +20,8 @@ interface AppProps {
   makeQrDataUrl?: MakeQrDataUrl
   /** Inject a fake random source in tests; defaults to the platform RNG. */
   random?: () => number
+  /** Inject a fixed transfer id in tests; defaults to a fresh random id. */
+  makeTransferId?: MakeTransferId
 }
 
 export default function App({
@@ -25,11 +29,13 @@ export default function App({
   exportLeads = defaultExportLeads,
   makeQrDataUrl = defaultMakeQrDataUrl,
   random = Math.random,
+  makeTransferId = defaultMakeTransferId,
 }: AppProps = {}) {
   const [leads, setLeads] = useState<Lead[]>(() => loadLeads())
   const [scanning, setScanning] = useState(false)
   const [makingBadge, setMakingBadge] = useState(false)
   const [raffling, setRaffling] = useState(false)
+  const [sharingList, setSharingList] = useState(false)
 
   return (
     <main className="app">
@@ -85,13 +91,23 @@ export default function App({
       </div>
 
       <footer className="foot">
-        <button
-          className="make-badge-link"
-          type="button"
-          onClick={() => setMakingBadge(true)}
-        >
-          Make a badge
-        </button>
+        <div className="foot-links">
+          <button
+            className="make-badge-link"
+            type="button"
+            onClick={() => setMakingBadge(true)}
+          >
+            Make a badge
+          </button>
+          <button
+            className="share-list-link"
+            type="button"
+            disabled={leads.length === 0}
+            onClick={() => setSharingList(true)}
+          >
+            Show my list as codes
+          </button>
+        </div>
         <span className="foot-glossary">Attendee · Vendor · Badge · Scan · Lead · Export</span>
       </footer>
 
@@ -110,6 +126,15 @@ export default function App({
 
       {raffling ? (
         <RaffleOverlay leads={leads} onDone={() => setRaffling(false)} random={random} />
+      ) : null}
+
+      {sharingList ? (
+        <ShareListView
+          leads={leads}
+          onDone={() => setSharingList(false)}
+          makeQrDataUrl={makeQrDataUrl}
+          makeTransferId={makeTransferId}
+        />
       ) : null}
     </main>
   )

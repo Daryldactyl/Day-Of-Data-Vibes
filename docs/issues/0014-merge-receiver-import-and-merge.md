@@ -43,6 +43,14 @@ de-duplicated list, and a summary shows **"Imported N new Leads (P already had).
 > and the DEV-seam design. This is the **largest** slice; if it proves too big at handoff time, split it
 > (scan + progress vs merge + summary) then.
 
+> **⚠️ Density/scannability tuning (carried from Slice 0013):** the QR codes the sender renders must actually be
+> **scannable by this receiver on real hardware**. Slice 0013's inspection measured a 20-Lead chunk at **1,881
+> bytes** (~160-module QR) — too dense at the reused **320px** render — and found jsQR-from-a-PNG to be a **flaky
+> proxy** (non-monotonic across sizes), so the real call needs phones. **This slice owns that decision:** during
+> the **real-second-phone QA**, test scannability across realistic list sizes and **tune `DEFAULT_CHUNK_SIZE`
+> (in `src/lib/listTransfer.ts`) and/or the sender's QR render size** until codes scan reliably end-to-end. Do
+> NOT finalize a chunk size from headless jsQR alone — measure on real cameras.
+
 ## Disciplines
 
 Build via **`/tdd`** (red → green → refactor, **one test at a time**; vertical tracer-bullet, never horizontal).

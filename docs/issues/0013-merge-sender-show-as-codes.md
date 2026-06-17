@@ -14,16 +14,36 @@ so a transfer is deterministic under test. Read-only — sharing alters no Leads
 
 ## Acceptance criteria
 
-- [ ] A "Show my list as codes" view renders ⌈N/chunkSize⌉ QR images (via the injected `makeQrDataUrl`) in a
+- [x] A "Show my list as codes" view renders ⌈N/chunkSize⌉ QR images (via the injected `makeQrDataUrl`) in a
       **scrollable stack**, each labelled "code *i* of *M*".
-- [ ] It uses Slice 12's `encodeListChunks`; the transfer id comes from an injected `makeTransferId` (default
+- [x] It uses Slice 12's `encodeListChunks`; the transfer id comes from an injected `makeTransferId` (default
       random), deterministic under test.
-- [ ] Sensible **empty behavior at 0 Leads** (nothing to share).
-- [ ] An entry point sits with the list-sharing actions; a way back to Home; **read-only** (alters no Leads).
-- [ ] Durable Vitest/RTL tests: N Leads → the expected number of codes + correct labels (inject a fake
+- [x] Sensible **empty behavior at 0 Leads** (nothing to share).
+- [x] An entry point sits with the list-sharing actions; a way back to Home; **read-only** (alters no Leads).
+- [x] Durable Vitest/RTL tests: N Leads → the expected number of codes + correct labels (inject a fake
       `makeQrDataUrl` + a fixed `makeTransferId`). A live Playwright MCP QA pass opens the view and confirms the
       scrollable QR stack renders.
-- [ ] `npm test` all green, `tsc -b` + `npm run lint` clean.
+- [x] `npm test` all green, `tsc -b` + `npm run lint` clean.
+
+## Implementation notes (Slice 13)
+
+- **New seam** `src/transferId.ts` — `MakeTransferId = () => string` + `defaultMakeTransferId` (random id);
+  injected into `App` (default real) like `makeQrDataUrl`. Generated **once** via a lazy `useState` initializer in
+  the view (never inline in render → no purity lint).
+- **Component** `src/ShareListView.tsx` — computes one transfer id, `encodeListChunks(leads, id,
+  DEFAULT_CHUNK_SIZE)`, generates a QR data URL per chunk via the reused `makeQrDataUrl` (in an effect, with a
+  cancel guard), and renders a scrollable `.share-stack` of cards each labelled **"Code i+1 of M"** (1-based).
+  Full-screen, Done returns. Read-only. Footer entry "Show my list as codes" (beside "Make a badge"), disabled at
+  0 Leads.
+- **Verified + a real finding (chased, not hand-waved):** built by a subagent via TDD (8 tests). **Independently
+  inspected**: re-ran (109 green), re-read the code, and **decoded a real rendered QR's pixels** (jsQR) → a small
+  chunk round-tripped to a valid `ListChunk` with the seeded Leads (encoding/rendering **proven correct**).
+  **However**, a 20-Lead chunk is **1,881 bytes** (~160-module QR) and would not decode at the reused **320px**
+  render size. Probing chunk sizes 6/8/10/12/14/16/20 gave **non-monotonic** jsQR results — i.e. jsQR-from-a-320px
+  PNG is a **flaky proxy** for real scannability (alignment-sensitive), so the exact scannable chunk size **cannot
+  be settled here**. The encoding is right; the **density/scannability tuning is deferred to Slice 0014's
+  real-phone QA** (see its note). `DEFAULT_CHUNK_SIZE` deliberately left unchanged — no guessing from noisy data.
+- Implemented from `docs/handoffs/slice-13-merge-sender-show-as-codes.md`.
 
 ## Blocked by
 
