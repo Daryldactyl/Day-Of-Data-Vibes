@@ -21,16 +21,16 @@ The **pure model foundation** for consolidation — **no UI, no camera** in this
 
 ## Acceptance criteria
 
-- [ ] The add-a-Lead logic de-dupes against **active ∪ archived**: a contact already in **active** → rejected; a
+- [x] The add-a-Lead logic de-dupes against **active ∪ archived**: a contact already in **active** → rejected; a
       contact already in **archived** → **rejected**; a new contact → added to active. With the archived argument
       defaulting to empty, behavior is **byte-identical to today** (regression guard test).
-- [ ] `archiveAll(active, archived)` moves the whole active list into archived (active empties; order + `scannedAt`
+- [x] `archiveAll(active, archived)` moves the whole active list into archived (active empties; order + `scannedAt`
       preserved); `restoreAll(active, archived)` moves all archived back into active; **archive-then-restore
       round-trips** to the original active set; both are **non-destructive** (no Lead lost or duplicated).
-- [ ] The archived bucket loads/saves on a **separate key**, independent of the active store; absent/empty → `[]`.
-- [ ] Durable pure Vitest tests cover all of the above (prior art: `src/lib/leads.test.ts`,
+- [x] The archived bucket loads/saves on a **separate key**, independent of the active store; absent/empty → `[]`.
+- [x] Durable pure Vitest tests cover all of the above (prior art: `src/lib/leads.test.ts`,
       `src/lib/leadsStorage.test.ts`, `src/lib/scan.test.ts`). **No UI/camera** in this slice.
-- [ ] `npm test` all green, `tsc -b` + `npm run lint` clean.
+- [x] `npm test` all green, `tsc -b` + `npm run lint` clean.
 
 ## Blocked by
 
