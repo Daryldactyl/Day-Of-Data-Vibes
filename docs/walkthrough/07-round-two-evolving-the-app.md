@@ -108,7 +108,7 @@ genuine data-model change — recorded as **[ADR-0005](../adr/0005-active-archiv
 
 ---
 
-*Round two shipped through the same loop that wrote this chapter — Raffle and the basic Merge are built, tested,
-and inspected; the consolidation idea the build itself sparked is grilled, designed (ADR-0005), and queued to
-build next. The method is the constant; the features just keep coming.* Start over from **[the index](index.md)**,
-or open [`slides/index.html`](../../slides/index.html) and give the talk.
+*Round two shipped through the same loop that wrote this chapter — Raffle, the basic Merge, and the
+consolidation lifecycle the build itself sparked (active/archived Leads, ADR-0005, slices 0015–0017) are all
+built, tested, and inspected. The method is the constant; the features just keep coming.* Start over from
+**[the index](index.md)**, or open [`slides/index.html`](../../slides/index.html) and give the talk.
