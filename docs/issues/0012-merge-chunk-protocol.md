@@ -24,18 +24,43 @@ thing is provable by tests before any camera or view exists. Four functions:
 
 ## Acceptance criteria
 
-- [ ] `encodeListChunks` splits N Leads into ⌈N/chunkSize⌉ codes, each carrying the marker, the transfer id, the
+- [x] `encodeListChunks` splits N Leads into ⌈N/chunkSize⌉ codes, each carrying the marker, the transfer id, the
       correct index/total, and its slice of Leads.
-- [ ] **Round-trip anchor test:** decoding + reassembling all emitted chunks reproduces the original Leads in order.
-- [ ] `decodeChunk`: a valid payload yields its chunk; a **vCard string** and arbitrary junk yield **`null`**.
-- [ ] `reassembleChunks`: partial input reports correct `have`/`total`/`missing`; **out-of-order** chunks
+- [x] **Round-trip anchor test:** decoding + reassembling all emitted chunks reproduces the original Leads in order.
+- [x] `decodeChunk`: a valid payload yields its chunk; a **vCard string** and arbitrary junk yield **`null`**.
+- [x] `reassembleChunks`: partial input reports correct `have`/`total`/`missing`; **out-of-order** chunks
       reassemble correctly; a **duplicate index** is idempotent; a **foreign transfer id** is ignored; the
       complete set yields the assembled Leads.
-- [ ] `mergeLeads`: de-dupes by normalized email (existing wins), preserves incoming `scannedAt` for new Leads,
+- [x] `mergeLeads`: de-dupes by normalized email (existing wins), preserves incoming `scannedAt` for new Leads,
       is non-destructive, and reports correct `{ added, skipped }`.
-- [ ] Durable pure Vitest tests for all four (prior art: `src/lib/exportCsv.test.ts`, `src/lib/scan.test.ts`,
+- [x] Durable pure Vitest tests for all four (prior art: `src/lib/exportCsv.test.ts`, `src/lib/scan.test.ts`,
       `src/lib/vcard.test.ts` round-trip). No UI/camera.
-- [ ] `npm test` all green, `tsc -b` + `npm run lint` clean.
+- [x] `npm test` all green, `tsc -b` + `npm run lint` clean.
+
+## Implementation notes (Slice 12) — the contract slices 0013/0014 build on
+
+- **Module** `src/lib/listTransfer.ts`, TDD'd in `listTransfer.test.ts`. Final exported API:
+  - `DEFAULT_CHUNK_SIZE = 20` (tunable; not auto-applied — `chunkSize` is always passed in).
+  - `interface ListChunk { transferId: string; index: number; total: number; leads: Lead[] }`
+  - `encodeListChunks(leads, transferId, chunkSize): string[]`
+  - `decodeChunk(text): ListChunk | null`
+  - `reassembleChunks(chunks): { have, total, missing, complete, leads }`
+  - `mergeLeads(existing, incoming): { merged, added, skipped }`
+- **Payload string** (one per QR code) — `JSON.stringify` of:
+  `{"dod":"leads","v":1,"id":"<transferId>","i":<index>,"m":<total>,"leads":[ <Lead> ]}`.
+  Marker `"dod":"leads"` distinguishes it from a vCard (which isn't JSON → `JSON.parse` throws → `null`).
+  **`index` (`i`) is 0-based** (0..total-1); `m` is the chunk count; `missing` uses 0-based indices. **For
+  humans, label codes `i+1 of m`.** `decodeChunk` also rejects marked-but-structurally-malformed payloads → `null`.
+- **`reassembleChunks`** treats the **first** chunk's `transferId` as active and ignores foreign-id chunks;
+  idempotent by index (first-seen wins); tolerates out-of-order; concatenates Leads in index order.
+- **`mergeLeads`** reuses `addLead` as-is (ADR-0002: dedupe by normalized email, existing wins, new Leads keep
+  their own `scannedAt`, non-destructive); counts `added` (status `saved`) vs `skipped` (`duplicate`).
+- **Verified + a bug fixed in review:** built by a subagent via TDD (11 tests). On **adversarial inspection** the
+  orchestrator found `reassembleChunks([])` **threw** (`chunks[0]` undefined) — and that a naïve guard would
+  wrongly report `complete: true` for `total: 0`. Fixed test-first: empty input now returns
+  `{ have: 0, total: 0, missing: [], complete: false, leads: [] }` (+1 test). Re-ran: **101 green**, `tsc` + lint
+  clean. The subagent and a parallel Raffle subagent honestly reported the transient cross-file churn from
+  running concurrently.
 
 ## Blocked by
 

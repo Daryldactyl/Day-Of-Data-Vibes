@@ -7,6 +7,7 @@ import type { CreateScanner } from './scanner'
 import { defaultExportLeads } from './lib/exportCsv'
 import { BadgeGenerator } from './BadgeGenerator'
 import { defaultMakeQrDataUrl, type MakeQrDataUrl } from './badgeQr'
+import { RaffleOverlay } from './RaffleOverlay'
 
 interface AppProps {
   /** Inject a fake scanner in tests; defaults to the real camera scanner. */
@@ -15,16 +16,20 @@ interface AppProps {
   exportLeads?: (leads: Lead[]) => void | Promise<void>
   /** Inject a fake QR generator in tests; defaults to the real qrcode call. */
   makeQrDataUrl?: MakeQrDataUrl
+  /** Inject a fake random source in tests; defaults to the platform RNG. */
+  random?: () => number
 }
 
 export default function App({
   createScanner,
   exportLeads = defaultExportLeads,
   makeQrDataUrl = defaultMakeQrDataUrl,
+  random = Math.random,
 }: AppProps = {}) {
   const [leads, setLeads] = useState<Lead[]>(() => loadLeads())
   const [scanning, setScanning] = useState(false)
   const [makingBadge, setMakingBadge] = useState(false)
+  const [raffling, setRaffling] = useState(false)
 
   return (
     <main className="app">
@@ -69,6 +74,14 @@ export default function App({
         >
           Export
         </button>
+        <button
+          className="raffle-button"
+          type="button"
+          disabled={leads.length === 0}
+          onClick={() => setRaffling(true)}
+        >
+          Raffle
+        </button>
       </div>
 
       <footer className="foot">
@@ -93,6 +106,10 @@ export default function App({
 
       {makingBadge ? (
         <BadgeGenerator onDone={() => setMakingBadge(false)} makeQrDataUrl={makeQrDataUrl} />
+      ) : null}
+
+      {raffling ? (
+        <RaffleOverlay leads={leads} onDone={() => setRaffling(false)} random={random} />
       ) : null}
     </main>
   )
