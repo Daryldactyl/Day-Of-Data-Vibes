@@ -2,7 +2,8 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { render, screen, fireEvent, cleanup, act } from '@testing-library/react'
 import App from './App'
 import { encodeVCard } from './lib/vcard'
-import { loadLeads } from './lib/leadsStorage'
+import { loadLeads, saveArchived } from './lib/leadsStorage'
+import type { Lead } from './lib/leads'
 import type { CreateScanner } from './scanner'
 
 /** A fake qr-scanner that captures the onDecode callback so a test can drive
@@ -76,5 +77,25 @@ describe('Scan flow', () => {
     expect(screen.queryByTestId('scan-overlay')).not.toBeInTheDocument()
     expect(screen.getByTestId('lead-count')).toHaveTextContent('1 lead')
     expect(screen.getByText('Ada Lovelace')).toBeInTheDocument()
+  })
+
+  it('rejects a Scan of an Attendee already in the archived bucket (dedup spans active ∪ archived — ADR-0005)', () => {
+    // Seed an archived Lead — an Attendee already handed off to a teammate.
+    const archived: Lead[] = [
+      { name: 'Grace Hopper', email: 'grace@dayofdata.example', scannedAt: '2026-06-10T12:00:00.000Z' },
+    ]
+    saveArchived(archived)
+
+    const fake = makeFakeScanner()
+    render(<App createScanner={fake.create} />)
+    fireEvent.click(screen.getByRole('button', { name: 'Scan' }))
+
+    // Re-scanning the archived Attendee is a duplicate: no new active row.
+    fake.scan(badge('Grace Hopper', 'grace@dayofdata.example'))
+    expect(screen.getByTestId('scan-toast')).toHaveTextContent('Already saved: Grace Hopper')
+    expect(screen.getByTestId('scan-lead-count')).toHaveTextContent('0 leads')
+
+    // Nothing was added to the active store.
+    expect(loadLeads()).toEqual([])
   })
 })

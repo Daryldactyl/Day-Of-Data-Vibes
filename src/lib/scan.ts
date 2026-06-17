@@ -12,14 +12,20 @@ export interface ScanResult {
 
 /** Turn a raw decoded QR string into an updated Leads list + a notification.
  *  Pure: `scannedAt` is passed in, no clock or storage. A QR that isn't a
- *  parseable Badge yields 'not-a-badge'; otherwise dedup (ADR-0002) decides
- *  between 'saved' and 'duplicate'. */
-export function handleScan(leads: Lead[], rawQrText: string, scannedAt: string): ScanResult {
+ *  parseable Badge yields 'not-a-badge'; otherwise dedup (ADR-0002, widened by
+ *  ADR-0005 to span active ∪ archived) decides between 'saved' and 'duplicate'.
+ *  `archived` defaults to [] so existing 3-arg callers are unaffected. */
+export function handleScan(
+  leads: Lead[],
+  rawQrText: string,
+  scannedAt: string,
+  archived: Lead[] = [],
+): ScanResult {
   const contact = parseVCard(rawQrText)
   if (contact === null) {
     return { leads, notification: 'not-a-badge', contact: null }
   }
-  const { leads: nextLeads, status } = addLead(leads, contact, scannedAt)
+  const { leads: nextLeads, status } = addLead(leads, contact, scannedAt, archived)
   return { leads: nextLeads, notification: status, contact }
 }
 

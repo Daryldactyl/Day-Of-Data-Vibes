@@ -7,6 +7,10 @@ import { defaultMakeTransferId, type MakeTransferId } from './transferId'
 interface ShareListViewProps {
   leads: Lead[]
   onDone: () => void
+  /** The deliberate "archive these" action — the Vendor confirms the handoff
+   *  landed, moving the whole active list to archived (ADR-0005). Never a side
+   *  effect of opening/closing this view: only this button archives. */
+  onArchive: () => void
   makeQrDataUrl?: MakeQrDataUrl
   makeTransferId?: MakeTransferId
 }
@@ -17,6 +21,7 @@ interface ShareListViewProps {
 export function ShareListView({
   leads,
   onDone,
+  onArchive,
   makeQrDataUrl = defaultMakeListQrDataUrl,
   makeTransferId = defaultMakeTransferId,
 }: ShareListViewProps) {
@@ -59,6 +64,12 @@ export function ShareListView({
             </p>
           </div>
         ))}
+      </div>
+
+      <div className="share-archive">
+        <button className="share-archive-button" type="button" onClick={onArchive}>
+          I've handed these off — archive them
+        </button>
       </div>
     </div>
   )

@@ -24,6 +24,7 @@ describe('ShareListView', () => {
       <ShareListView
         leads={leads}
         onDone={() => {}}
+        onArchive={() => {}}
         makeQrDataUrl={makeQrDataUrl}
         makeTransferId={() => 'fixed-id'}
       />,
@@ -42,6 +43,7 @@ describe('ShareListView', () => {
       <ShareListView
         leads={leads}
         onDone={() => {}}
+        onArchive={() => {}}
         makeQrDataUrl={makeQrDataUrl}
         makeTransferId={() => 'fixed-id'}
       />,
@@ -59,6 +61,7 @@ describe('ShareListView', () => {
       <ShareListView
         leads={leads}
         onDone={() => {}}
+        onArchive={() => {}}
         makeQrDataUrl={makeQrDataUrl}
         makeTransferId={() => 'fixed-id'}
       />,
@@ -81,6 +84,7 @@ describe('ShareListView', () => {
       <ShareListView
         leads={leads}
         onDone={() => {}}
+        onArchive={() => {}}
         makeQrDataUrl={makeQrDataUrl}
         makeTransferId={() => 'fixed-id'}
       />,

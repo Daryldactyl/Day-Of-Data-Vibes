@@ -18,6 +18,9 @@ interface Summary {
 
 interface ImportListViewProps {
   leads: Lead[]
+  /** Archived Leads — handed off and set aside. Threaded into the Merge dedup so
+   *  an archived Attendee is skipped on import (active ∪ archived — ADR-0005). */
+  archived?: Lead[]
   onLeadsChange: (leads: Lead[]) => void
   onDone: () => void
   createScanner?: CreateScanner
@@ -30,6 +33,7 @@ interface ImportListViewProps {
  *  a vCard Badge scanned here is ignored (ADR-0001). */
 export function ImportListView({
   leads,
+  archived = [],
   onLeadsChange,
   onDone,
   createScanner = defaultCreateScanner,
@@ -43,9 +47,11 @@ export function ImportListView({
   // Refs so the long-lived onDecode closure always merges against current Leads
   // and calls the current onLeadsChange (mirrors ScanOverlay).
   const leadsRef = useRef(leads)
+  const archivedRef = useRef(archived)
   const onLeadsChangeRef = useRef(onLeadsChange)
   useEffect(() => {
     leadsRef.current = leads
+    archivedRef.current = archived
     onLeadsChangeRef.current = onLeadsChange
   })
 
@@ -69,7 +75,7 @@ export function ImportListView({
     setProgress({ have, total, missing })
     if (complete) {
       doneRef.current = true
-      const { merged, added, skipped } = mergeLeads(leadsRef.current, incoming)
+      const { merged, added, skipped } = mergeLeads(leadsRef.current, incoming, archivedRef.current)
       onLeadsChangeRef.current(merged)
       saveLeads(merged)
       setSummary({ added, skipped })

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import './App.css'
-import { loadLeads } from './lib/leadsStorage'
+import { loadLeads, loadArchived, saveLeads, saveArchived } from './lib/leadsStorage'
+import { archiveAll } from './lib/leads'
 import type { Lead } from './lib/leads'
 import { ScanOverlay } from './ScanOverlay'
 import type { CreateScanner } from './scanner'
@@ -37,11 +38,27 @@ export default function App({
   makeTransferId = defaultMakeTransferId,
 }: AppProps = {}) {
   const [leads, setLeads] = useState<Lead[]>(() => loadLeads())
+  // Archived Leads — handed off and set aside (ADR-0005). Loaded once on init,
+  // threaded into the add-paths (Scan, import) so an archived Attendee is still
+  // deduped against. Home/Export/Raffle/Share never read this bucket.
+  const [archived, setArchived] = useState<Lead[]>(() => loadArchived())
   const [scanning, setScanning] = useState(false)
   const [makingBadge, setMakingBadge] = useState(false)
   const [raffling, setRaffling] = useState(false)
   const [sharingList, setSharingList] = useState(false)
   const [importingList, setImportingList] = useState(false)
+
+  // The deliberate "archive these" handoff action (ADR-0005): move the whole
+  // active list → archived, persist BOTH stores, and return to Home. Active is
+  // now empty (Home shows the empty state; Export/Raffle/Share disable for free).
+  function handleArchive() {
+    const next = archiveAll(leads, archived)
+    setLeads(next.active)
+    setArchived(next.archived)
+    saveLeads(next.active)
+    saveArchived(next.archived)
+    setSharingList(false)
+  }
 
   return (
     <main className="app">
@@ -127,6 +144,7 @@ export default function App({
       {scanning ? (
         <ScanOverlay
           leads={leads}
+          archived={archived}
           onLeadsChange={setLeads}
           onDone={() => setScanning(false)}
           createScanner={createScanner}
@@ -145,6 +163,7 @@ export default function App({
         <ShareListView
           leads={leads}
           onDone={() => setSharingList(false)}
+          onArchive={handleArchive}
           makeQrDataUrl={makeListQrDataUrl}
           makeTransferId={makeTransferId}
         />
@@ -153,6 +172,7 @@ export default function App({
       {importingList ? (
         <ImportListView
           leads={leads}
+          archived={archived}
           onLeadsChange={setLeads}
           onDone={() => setImportingList(false)}
           createScanner={createScanner}

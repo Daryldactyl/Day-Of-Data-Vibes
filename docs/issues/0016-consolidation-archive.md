@@ -18,19 +18,37 @@ on the active list only (no change to their logic — they simply never see arch
 
 ## Acceptance criteria
 
-- [ ] The app loads and holds **both** active and archived Leads; the archived set is threaded into the Scan and
+- [x] The app loads and holds **both** active and archived Leads; the archived set is threaded into the Scan and
       import paths.
-- [ ] A **Scan** of an Attendee whose email is in **archived** is rejected (dedup hit, "Already saved", no new
+- [x] A **Scan** of an Attendee whose email is in **archived** is rejected (dedup hit, "Already saved", no new
       active row); a **Merge import** of an email in active **or** archived is likewise skipped (existing wins).
-- [ ] The handoff view has a deliberate **"archive these"** action that moves the **whole active list** → archived
+- [x] The handoff view has a deliberate **"archive these"** action that moves the **whole active list** → archived
       and persists both stores; afterward Home shows no active Leads and Export/Raffle become empty/disabled.
       Archiving is **never automatic** — opening/closing the share view archives nothing.
-- [ ] **Export, Raffle, Home, and the Share handoff operate on the active list only** (archived excluded) — verified;
+- [x] **Export, Raffle, Home, and the Share handoff operate on the active list only** (archived excluded) — verified;
       no logic change to them.
-- [ ] Durable RTL tests (inject the archived state): a Scan/import of an archived email is rejected; "archive these"
+- [x] Durable RTL tests (inject the archived state): a Scan/import of an archived email is rejected; "archive these"
       moves active→archived and persists both stores; Export/Raffle act on active only. A live Playwright MCP QA pass
       archives the list (Home clears) and confirms scanning an archived email is rejected.
-- [ ] `npm test` all green, `tsc -b` + `npm run lint` clean.
+- [x] `npm test` all green, `tsc -b` + `npm run lint` clean.
+
+## Implementation notes (Slice 16) — for slice 0017
+
+- **App** now holds `const [archived, setArchived] = useState<Lead[]>(() => loadArchived())` beside `leads`, and
+  threads `archived` into `ScanOverlay` + `ImportListView` (each gained an optional `archived?: Lead[]` prop held
+  in a ref). `handleScan(..., archived=[])` and `mergeLeads(..., archived=[])` now pass it into `addLead`
+  (defaults `[]` → existing callers unchanged). `ShareListView` gained a required `onArchive` prop + an "I've
+  handed these off — archive them" button. **`handleArchive()`** = `archiveAll(leads, archived)` →
+  `setLeads/setArchived` + `saveLeads/saveArchived` + close → Home.
+- **For slice 0017:** the **archived-count + Restore** control belongs in the Home **footer** (`.foot-links`,
+  beside "Make a badge" / "Import a list"). Add a `handleRestore()` symmetric to `handleArchive` (using
+  `restoreAll`); the state + both persisters are already in place — 0017 only adds the `archived.length` read +
+  the restore handler + the UI.
+- **Verified (independent + adversarial):** 141 tests green, tsc + lint clean. **Live Playwright QA**: Home shows
+  active only (archived hidden); **re-scanning an archived Attendee is rejected** ("Already saved", no new row);
+  opening the share view + Done archives **nothing**; "archive these" moves active→archived (persisted both
+  stores), Home empties, Export/Raffle disable. (Note: the archive button has class hooks but no CSS polish yet —
+  cosmetic, not behavioral.)
 
 ## Blocked by
 

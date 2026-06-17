@@ -114,16 +114,20 @@ export function reassembleChunks(chunks: ListChunk[]): {
 
 /** Fold each incoming Lead through `addLead` (ADR-0002): dedupe by normalized
  *  email (existing wins), append genuinely-new Leads WITH THEIR OWN scannedAt
- *  (not "now"), non-destructive. Returns the merged list and added/skipped counts. */
+ *  (not "now"), non-destructive. Dedup spans active (`existing`) ∪ `archived`
+ *  (ADR-0005) so an already-handed-off Attendee is skipped; `archived` defaults
+ *  to [] so existing 2-arg callers are unaffected. Returns the merged list and
+ *  added/skipped counts. */
 export function mergeLeads(
   existing: Lead[],
   incoming: Lead[],
+  archived: Lead[] = [],
 ): { merged: Lead[]; added: number; skipped: number } {
   let merged = existing
   let added = 0
   let skipped = 0
   for (const lead of incoming) {
-    const result = addLead(merged, lead, lead.scannedAt)
+    const result = addLead(merged, lead, lead.scannedAt, archived)
     merged = result.leads
     if (result.status === 'saved') added++
     else skipped++

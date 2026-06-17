@@ -217,4 +217,28 @@ describe('mergeLeads', () => {
     // Non-destructive: the caller's existing array is untouched.
     expect(existing).toEqual(before)
   })
+
+  it('skips an incoming Lead whose email is in the archived bucket (dedup spans active ∪ archived — ADR-0005)', () => {
+    const existing: Lead[] = [
+      { name: 'Ada Lovelace', email: 'ada@x.example', scannedAt: '2026-06-16T09:00:00.000Z' },
+    ]
+    const archived: Lead[] = [
+      { name: 'Grace Hopper', email: 'grace@x.example', scannedAt: '2026-06-15T08:00:00.000Z' },
+    ]
+    const incoming: Lead[] = [
+      // Already handed off (archived) — must be skipped, never re-added.
+      { name: 'Grace H.', email: 'GRACE@x.example', scannedAt: '2026-06-16T11:00:00.000Z' },
+      // Genuinely new — added.
+      { name: 'Alan Turing', email: 'alan@x.example', scannedAt: '2026-06-16T10:30:00.000Z' },
+    ]
+
+    const result = mergeLeads(existing, incoming, archived)
+
+    expect(result.added).toBe(1)
+    expect(result.skipped).toBe(1)
+    expect(result.merged).toEqual([
+      { name: 'Ada Lovelace', email: 'ada@x.example', scannedAt: '2026-06-16T09:00:00.000Z' },
+      { name: 'Alan Turing', email: 'alan@x.example', scannedAt: '2026-06-16T10:30:00.000Z' },
+    ])
+  })
 })

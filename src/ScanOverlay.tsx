@@ -19,6 +19,9 @@ const SCAN_GAP_MS = 1500
 
 interface ScanOverlayProps {
   leads: Lead[]
+  /** Archived Leads — handed off and set aside. Threaded into dedup so an
+   *  archived Attendee can never be re-scanned (active ∪ archived — ADR-0005). */
+  archived?: Lead[]
   onLeadsChange: (leads: Lead[]) => void
   onDone: () => void
   createScanner?: CreateScanner
@@ -27,6 +30,7 @@ interface ScanOverlayProps {
 
 export function ScanOverlay({
   leads,
+  archived = [],
   onLeadsChange,
   onDone,
   createScanner = defaultCreateScanner,
@@ -40,9 +44,11 @@ export function ScanOverlay({
   const lastDecode = useRef<LastDecode | null>(null)
   // Refs so the scanner's long-lived onDecode closure always sees current state.
   const leadsRef = useRef(leads)
+  const archivedRef = useRef(archived)
   const onLeadsChangeRef = useRef(onLeadsChange)
   useEffect(() => {
     leadsRef.current = leads
+    archivedRef.current = archived
     onLeadsChangeRef.current = onLeadsChange
   })
 
@@ -60,7 +66,12 @@ export function ScanOverlay({
     lastDecode.current = { key: rawQrText, at: now }
     if (!fresh) return
 
-    const result = handleScan(leadsRef.current, rawQrText, decodedAt.toISOString())
+    const result = handleScan(
+      leadsRef.current,
+      rawQrText,
+      decodedAt.toISOString(),
+      archivedRef.current,
+    )
     if (result.notification === 'saved' || result.notification === 'duplicate') {
       const name = result.contact?.name ?? ''
       if (result.notification === 'saved') {

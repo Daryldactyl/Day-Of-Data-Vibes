@@ -29,7 +29,12 @@ describe('ShareListView default QR generator', () => {
   it('uses the larger list QR (>320px) when no makeQrDataUrl is injected', async () => {
     // No makeQrDataUrl prop → ShareListView's default generator runs.
     render(
-      <ShareListView leads={[lead(1), lead(2)]} onDone={() => {}} makeTransferId={() => 'id'} />,
+      <ShareListView
+        leads={[lead(1), lead(2)]}
+        onDone={() => {}}
+        onArchive={() => {}}
+        makeTransferId={() => 'id'}
+      />,
     )
     await screen.findByRole('img')
 

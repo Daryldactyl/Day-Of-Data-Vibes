@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { render, screen, fireEvent, cleanup, act } from '@testing-library/react'
 import App from './App'
 import { encodeListChunks } from './lib/listTransfer'
-import { loadLeads } from './lib/leadsStorage'
+import { loadLeads, saveArchived } from './lib/leadsStorage'
 import type { Lead } from './lib/leads'
 import type { CreateScanner } from './scanner'
 
@@ -62,5 +62,32 @@ describe('Import a list — App wiring', () => {
     expect(screen.getByText('A')).toBeInTheDocument()
     expect(screen.getByText('B')).toBeInTheDocument()
     expect(loadLeads()).toEqual([lead('A', 'a@x.example'), lead('B', 'b@x.example')])
+  })
+
+  it('skips an imported Lead already in the archived bucket (dedup spans active ∪ archived — ADR-0005)', () => {
+    // An Attendee already handed off (archived) — re-importing must not re-add.
+    saveArchived([lead('Grace', 'grace@x.example')])
+
+    const fake = makeFakeScanner()
+    render(<App createScanner={fake.create} />)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Import a list' }))
+
+    // Incoming chunk: one already-archived Attendee + one genuinely new.
+    const codes = encodeListChunks(
+      [lead('Grace', 'grace@x.example'), lead('New Person', 'new@x.example')],
+      't1',
+      9,
+    )
+    fake.scan(codes[0])
+    expect(screen.getByTestId('import-summary')).toHaveTextContent(
+      'Imported 1 new Lead (1 already had)',
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Done' }))
+
+    // Only the new Attendee landed in the active store; the archived one was skipped.
+    expect(screen.getByTestId('lead-count')).toHaveTextContent('1 lead')
+    expect(loadLeads()).toEqual([lead('New Person', 'new@x.example')])
   })
 })

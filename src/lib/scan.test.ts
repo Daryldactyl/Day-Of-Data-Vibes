@@ -23,6 +23,16 @@ describe('handleScan', () => {
     expect(result.leads).toEqual(existing)
   })
 
+  it('reports a duplicate when the Attendee is already in the archived bucket (dedup spans active ∪ archived — ADR-0005)', () => {
+    const archived: Lead[] = [
+      { name: 'Ada Lovelace', email: 'ada@dayofdata.example', scannedAt: '2026-06-10T12:00:00.000Z' },
+    ]
+    const badge = encodeVCard({ name: 'Ada Lovelace', email: 'ada@dayofdata.example' })
+    const result = handleScan([], badge, '2026-06-10T16:00:00.000Z', archived)
+    expect(result.notification).toBe('duplicate')
+    expect(result.leads).toEqual([])
+  })
+
   it('reports not-a-badge and leaves leads unchanged for a QR that is not a Badge', () => {
     const existing: Lead[] = [
       { name: 'Ada Lovelace', email: 'ada@dayofdata.example', scannedAt: '2026-06-10T15:00:00.000Z' },
