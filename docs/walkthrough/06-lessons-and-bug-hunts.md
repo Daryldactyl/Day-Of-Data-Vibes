@@ -80,6 +80,9 @@ working on a **real phone**.
 
 ---
 
-That's the build: a bare shell turned into a deployed app through one repeatable loop, with the bumps left
-visible on purpose. Go run the loop on your own idea — start at **[the index](index.md)**, or open
+That's the *initial* build: a bare shell turned into a deployed app through one repeatable loop, with the bumps
+left visible on purpose. But shipping wasn't the end — a stakeholder used it and asked for more, and the loop ran
+again. **[Round two — when the client comes back →](07-round-two-evolving-the-app.md)**
+
+Or go run the loop on your own idea — start at **[the index](index.md)**, or open
 [`slides/index.html`](../../slides/index.html) and give the talk.

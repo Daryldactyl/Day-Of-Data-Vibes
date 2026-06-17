@@ -65,4 +65,32 @@ A vendor can, on their own phone with no install friction: scan several attendee
 - Camera/QR library choice and how we keep it minimal.
 - What "installable PWA / offline" actually needs to include for v1.
 
-> These ambiguities are *intentional* — they're what the live `/grill-with-docs` session will resolve into the app's own `CONTEXT.md`, then `/to-prd`, then `/to-issues`.
+> These ambiguities are *intentional* — they're what the live `/grill-with-docs` session will resolve into the app's own `CONTEXT.md`, then `/to-prd`, then `/to-issues`. A **second round** of features — requested *after* the first build shipped — is captured in **§10**.
+
+---
+
+## 10. Round two — features requested after the first working build
+
+> Everything above (§1–§9) is the original brief: what we opened the live build from. Everything in this section came **after** — once the app was working and we put it in front of the Day of Data organizers. Seeing it run generated concrete new asks. We fold them into the same spec, with their origin recorded, so the grilling sessions that plan them aren't a mystery to anyone following along: this is normal, healthy product evolution — a client's appetite sharpens once they can hold the real thing. Each item below runs through the *same* `/grill-with-docs` → `/to-prd` → `/to-issues` loop as the originals.
+
+**Source:** feedback from **Andy** (organizing committee) after using the first working app — *"I scanned the sample QR codes and was able to export the corresponding CSV… I'm going to show this to everyone else."* Two requests, plus one idea we deliberately declined.
+
+### 10.1 Raffle *(should-have — wanted before the event)*
+A third action on Home — **Scan · Export · Raffle** — for running the booth's prize draw from the app itself. Tapping **Raffle** randomly highlights one collected **Lead** as the winner; tapping again re-rolls to a possibly-different winner; repeat as often as you like. Local to the phone, no server, no new data — it just picks from the Leads already collected.
+
+*Deliberate ambiguities to grill (don't pre-answer):*
+- **Reveal style:** highlight the winner's **row in the Leads list**, or a dedicated full-screen "winner" reveal?
+- **Re-roll semantics:** each press an independent random pick **with replacement** (the same person can win twice — matching "a possibly different record")? Should it avoid an *immediate* repeat?
+- **Suspense:** instant highlight, or a brief slot-machine cycle before it lands?
+- **Placement & edges:** third button; disabled at 0 Leads (a 1-Lead list always wins); **read-only** — Raffle never removes or alters a Lead.
+
+### 10.2 Share / merge a teammate's list *(should-have — stretch)*
+Multiple staff often work one sponsor table, each scanning on their own phone. Today each phone keeps its own list (fine — they can export separately and combine later). This feature lets one phone **import another phone's Leads and merge them**, matching and **de-duplicating by email** the same way a single phone already does — so a table can finish with one combined list (and one fair raffle over it). **Peer-to-peer, no central database** — the data moves device-to-device and stays local.
+
+*Deliberate ambiguities to grill (don't pre-answer):*
+- **Transport (the key fork):** a **file / share-sheet import** (Phone A shares its list via AirDrop/Messages → Phone B imports — any size, lowest effort, reuses Export's share sheet) vs a **single QR** the other phone scans (elegant and on-brand, but capped to a small list by QR capacity and needs a second scan mode — the scanner today only accepts vCard badges) vs a **chunked/animated QR** (any size, more effort).
+- **Merge rules:** de-dupe by **normalized email** (reuse the existing dedup rule); on same-email/different-name keep the existing record; keep the earliest scan time. **One-way import, non-destructive** (merge, never delete).
+- **Privacy:** sharing Attendee contacts phone-to-phone among the same booth's staff is consensual and mild — note it consciously; crucially it adds **no central store**.
+
+### 10.3 Deliberately declined — a central shared database *(won't have)*
+Andy also floated a central database of names so every phone at a table sees one shared list. **Declined for now** (likely indefinitely): it means a server plus the **PII responsibilities** of storing attendee contacts centrally — exactly what the URL-first, local-only design exists to avoid. §10.2's peer-to-peer merge is the chosen alternative: it solves the same multi-phone need *without* the central store. Recorded here so the "why not just a database?" question has a standing answer.

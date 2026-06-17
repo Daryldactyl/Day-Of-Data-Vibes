@@ -26,3 +26,9 @@ A Vendor-triggered build of a CSV file of all Leads, downloaded to the Vendor's 
 
 **Badge Generator** _(should-have)_:
 A view that mints a Badge QR from a typed name + email, so Attendees can self-serve and the demo is self-contained.
+
+**Raffle** _(should-have)_:
+A Vendor-triggered draw that picks one collected Lead at random as the prize winner. Ephemeral and non-destructive — each draw is an independent, uniformly-random pick over the Vendor's current Leads, re-rollable as often as the Vendor likes, and never adds, removes, or reorders a Lead.
+
+**Merge** _(should-have)_:
+Combining another Vendor's collected Leads into your own list, so several phones at one booth can finish with one combined list. One Vendor imports a teammate's Leads and they are de-duplicated by email the same way a single list already is (existing Leads win; new ones are added with their original scan time). Peer-to-peer and on-device — no central store — and non-destructive (import only ever adds).

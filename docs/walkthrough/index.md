@@ -77,6 +77,11 @@ the slices → the hand-off and TDD → the QA → the transformation screenshot
 Then: **[Lessons & bug hunts](06-lessons-and-bug-hunts.md)** — the two debugging stories told honestly,
 including the one where the "bug" turned out to be the *test harness itself*.
 
+And the story keeps going: **[Round two — when the client comes back](07-round-two-evolving-the-app.md)** — the
+same loop running *again* on features the original brief never imagined (a gamified **Raffle**; a peer-to-peer
+**Merge** of teammates' lists), driven by real stakeholder feedback after launch. Proof the method is for the
+whole life of an app, not just day one.
+
 ---
 
 ## Reproduce this flow yourself
