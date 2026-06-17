@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { Lead } from './lib/leads'
 import { encodeListChunks, DEFAULT_CHUNK_SIZE } from './lib/listTransfer'
-import { defaultMakeQrDataUrl, type MakeQrDataUrl } from './badgeQr'
+import { defaultMakeListQrDataUrl, type MakeQrDataUrl } from './badgeQr'
 import { defaultMakeTransferId, type MakeTransferId } from './transferId'
 
 interface ShareListViewProps {
@@ -17,7 +17,7 @@ interface ShareListViewProps {
 export function ShareListView({
   leads,
   onDone,
-  makeQrDataUrl = defaultMakeQrDataUrl,
+  makeQrDataUrl = defaultMakeListQrDataUrl,
   makeTransferId = defaultMakeTransferId,
 }: ShareListViewProps) {
   // Compute the transfer id ONCE, through the injected capability (lazy

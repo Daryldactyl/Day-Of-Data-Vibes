@@ -1,7 +1,9 @@
 import { addLead, type Lead } from './leads'
 
-/** Default Leads per QR code (tunable; see PRD / ADR-0004 — ~20–25 per code). */
-export const DEFAULT_CHUNK_SIZE = 20
+/** Default Leads per QR code (tunable; see PRD / ADR-0004). Slice 14's density
+ *  decision: 8–10 Leads/chunk so the codes stay scannable by a real receiver
+ *  camera at the enlarged sender QR size — confirmed on real phones. */
+export const DEFAULT_CHUNK_SIZE = 9
 
 /** One scanned QR's decoded contents. */
 export interface ListChunk {

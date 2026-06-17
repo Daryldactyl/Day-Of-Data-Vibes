@@ -16,8 +16,8 @@ describe('Share list (Merge sender) flow', () => {
 
   it('opens the sender view from the footer entry and Done returns to Home', async () => {
     saveLeads([lead(1), lead(2), lead(3)])
-    const makeQrDataUrl = vi.fn(async () => 'data:image/png;base64,QR')
-    render(<App makeQrDataUrl={makeQrDataUrl} makeTransferId={() => 'fixed-id'} />)
+    const makeListQrDataUrl = vi.fn(async () => 'data:image/png;base64,QR')
+    render(<App makeListQrDataUrl={makeListQrDataUrl} makeTransferId={() => 'fixed-id'} />)
 
     // Home is showing, sender view is not.
     expect(screen.queryByTestId('share-overlay')).not.toBeInTheDocument()

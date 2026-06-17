@@ -6,9 +6,10 @@ import { ScanOverlay } from './ScanOverlay'
 import type { CreateScanner } from './scanner'
 import { defaultExportLeads } from './lib/exportCsv'
 import { BadgeGenerator } from './BadgeGenerator'
-import { defaultMakeQrDataUrl, type MakeQrDataUrl } from './badgeQr'
+import { defaultMakeQrDataUrl, defaultMakeListQrDataUrl, type MakeQrDataUrl } from './badgeQr'
 import { RaffleOverlay } from './RaffleOverlay'
 import { ShareListView } from './ShareListView'
+import { ImportListView } from './ImportListView'
 import { defaultMakeTransferId, type MakeTransferId } from './transferId'
 
 interface AppProps {
@@ -16,8 +17,11 @@ interface AppProps {
   createScanner?: CreateScanner
   /** Inject a fake Export in tests; defaults to the real CSV download. */
   exportLeads?: (leads: Lead[]) => void | Promise<void>
-  /** Inject a fake QR generator in tests; defaults to the real qrcode call. */
+  /** Inject a fake Badge QR generator in tests; defaults to the real 320px call. */
   makeQrDataUrl?: MakeQrDataUrl
+  /** Inject a fake list QR generator in tests; defaults to the larger list QR
+   *  (the sender's dense Merge chunks need more pixels than a Badge). */
+  makeListQrDataUrl?: MakeQrDataUrl
   /** Inject a fake random source in tests; defaults to the platform RNG. */
   random?: () => number
   /** Inject a fixed transfer id in tests; defaults to a fresh random id. */
@@ -28,6 +32,7 @@ export default function App({
   createScanner,
   exportLeads = defaultExportLeads,
   makeQrDataUrl = defaultMakeQrDataUrl,
+  makeListQrDataUrl = defaultMakeListQrDataUrl,
   random = Math.random,
   makeTransferId = defaultMakeTransferId,
 }: AppProps = {}) {
@@ -36,6 +41,7 @@ export default function App({
   const [makingBadge, setMakingBadge] = useState(false)
   const [raffling, setRaffling] = useState(false)
   const [sharingList, setSharingList] = useState(false)
+  const [importingList, setImportingList] = useState(false)
 
   return (
     <main className="app">
@@ -107,6 +113,13 @@ export default function App({
           >
             Show my list as codes
           </button>
+          <button
+            className="import-list-link"
+            type="button"
+            onClick={() => setImportingList(true)}
+          >
+            Import a list
+          </button>
         </div>
         <span className="foot-glossary">Attendee · Vendor · Badge · Scan · Lead · Export</span>
       </footer>
@@ -132,8 +145,17 @@ export default function App({
         <ShareListView
           leads={leads}
           onDone={() => setSharingList(false)}
-          makeQrDataUrl={makeQrDataUrl}
+          makeQrDataUrl={makeListQrDataUrl}
           makeTransferId={makeTransferId}
+        />
+      ) : null}
+
+      {importingList ? (
+        <ImportListView
+          leads={leads}
+          onLeadsChange={setLeads}
+          onDone={() => setImportingList(false)}
+          createScanner={createScanner}
         />
       ) : null}
     </main>

@@ -18,7 +18,7 @@ const manyLeads = (n: number): Lead[] => Array.from({ length: n }, (_, i) => lea
 
 describe('ShareListView', () => {
   it('renders ceil(N/chunkSize) QR <img>s, one per chunk', async () => {
-    const leads = manyLeads(45) // ceil(45/20) = 3 chunks
+    const leads = manyLeads(45)
     const makeQrDataUrl = vi.fn(async (text: string) => `data:image/png;base64,QR(${text.length})`)
     render(
       <ShareListView
@@ -35,7 +35,8 @@ describe('ShareListView', () => {
   })
 
   it('labels each card "Code i+1 of M" (1-based for humans)', async () => {
-    const leads = manyLeads(45) // 3 chunks
+    const leads = manyLeads(45)
+    const m = Math.ceil(leads.length / DEFAULT_CHUNK_SIZE)
     const makeQrDataUrl = vi.fn(async () => 'data:image/png;base64,QR')
     render(
       <ShareListView
@@ -46,9 +47,9 @@ describe('ShareListView', () => {
       />,
     )
 
-    expect(await screen.findByText('Code 1 of 3')).toBeInTheDocument()
-    expect(screen.getByText('Code 2 of 3')).toBeInTheDocument()
-    expect(screen.getByText('Code 3 of 3')).toBeInTheDocument()
+    expect(await screen.findByText(`Code 1 of ${m}`)).toBeInTheDocument()
+    expect(screen.getByText(`Code 2 of ${m}`)).toBeInTheDocument()
+    expect(screen.getByText(`Code ${m} of ${m}`)).toBeInTheDocument()
   })
 
   it('calls makeQrDataUrl with exactly the encodeListChunks payload strings (real chunks)', async () => {

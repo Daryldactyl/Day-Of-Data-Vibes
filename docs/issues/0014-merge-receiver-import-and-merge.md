@@ -17,21 +17,40 @@ de-duplicated list, and a summary shows **"Imported N new Leads (P already had).
 
 ## Acceptance criteria
 
-- [ ] An "Import a list" view scans codes with the camera; decodes are routed to `decodeChunk`/`reassembleChunks`
+- [x] An "Import a list" view scans codes with the camera; decodes are routed to `decodeChunk`/`reassembleChunks`
       (import mode), **not** the Badge `handleScan` path.
-- [ ] Live **"imported *i* of *M*"** progress; shows which chunk indices are still **missing**; duplicate /
+- [x] Live **"imported *i* of *M*"** progress; shows which chunk indices are still **missing**; duplicate /
       foreign-transfer codes are handled per Slice 12 (idempotent / ignored).
-- [ ] A **vCard Badge** scanned in import mode is **ignored** (`decodeChunk` → `null`) — never confused with a
+- [x] A **vCard Badge** scanned in import mode is **ignored** (`decodeChunk` → `null`) — never confused with a
       chunk (ADR-0001).
-- [ ] On completion: `mergeLeads` merges the incoming Leads into the receiver's Leads and **persists**
+- [x] On completion: `mergeLeads` merges the incoming Leads into the receiver's Leads and **persists**
       (localStorage); Home reflects the combined, email-de-duplicated list; a **summary** shows "Imported N new
       Leads (P already had)."
-- [ ] **Non-destructive**; **one-way** (the sender's own list is unaffected).
-- [ ] Durable Vitest/RTL tests via an injected `createScanner` feeding chunk strings: progress advances,
+- [x] **Non-destructive**; **one-way** (the sender's own list is unaffected).
+- [x] Durable Vitest/RTL tests via an injected `createScanner` feeding chunk strings: progress advances,
       duplicate/foreign codes handled, a vCard is rejected, completion merges + shows the summary. A **DEV scan
-      seam** (like `__scanBadge`) is exposed for Playwright, and the **real camera-to-camera transfer is verified
-      on a real second phone** over the `npm run share` tunnel.
-- [ ] `npm test` all green, `tsc -b` + `npm run lint` clean.
+      seam** (`__importChunk`) is exposed for Playwright.
+- [x] `npm test` all green, `tsc -b` + `npm run lint` clean.
+- [ ] **Verified on real hardware (pending the Vendor's 2nd phone):** Phone A shows the codes, Phone B scans them
+      over `npm run share` → confirm they **scan reliably** at 9/chunk + the 680px QR and the list merges. (The
+      orchestrator already proved the full loop in-browser on real QR pixels; this is the camera-to-camera step.)
+
+## Implementation notes (Slice 14) — basic Merge complete
+
+- **Receiver** `src/ImportListView.tsx` — `createScanner` in **import mode**: each decode → `decodeChunk` (null →
+  ignored, so vCard/junk/foreign drop) → accumulate → `reassembleChunks` → progress "Imported i of total" +
+  "Still need: …"; on `complete` → `mergeLeads` (ADR-0002) → `onLeadsChange` + `saveLeads` + summary "Imported N
+  new (P already had)". One-shot via `doneRef`. Camera lifecycle + **graceful failures** (diagnose + error card +
+  Retry) mirror `ScanOverlay`. DEV seam `__importChunk`. App "Import a list" footer entry.
+- **Tuning:** `DEFAULT_CHUNK_SIZE` 20 → **9**; new `defaultMakeListQrDataUrl` at **680px** for the sender's list
+  codes (badge QR stays 320px).
+- **Verified (independent + adversarial):** 126 tests green, tsc + lint clean. **Full in-browser loop on real QR
+  pixels**: the sender's 680px codes all **decode** (the 320px density failure is resolved), a vCard fed to
+  import is **ignored**, out-of-order + duplicate chunks reassemble, merge deduped (shared email skipped) →
+  **"Imported 11 new Leads (1 already had)"**, Home = 14. **Review caught a gap** the subagent honestly flagged:
+  `scanner.start()` floated its rejection with no error UI — added the graceful-failure path **test-first** (no
+  more console error; error card + Retry in headless).
+- Real camera-to-camera scannability is the Vendor's pending 2nd-phone step.
 
 ## Blocked by
 
