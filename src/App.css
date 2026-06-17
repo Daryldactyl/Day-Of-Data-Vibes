@@ -540,11 +540,73 @@
   text-align: center;
 }
 
+/* The vertical name reel: a scrolling strip of name cells inside a fixed
+ * viewport with a centered highlight band (the "slot"). The strip's translateY
+ * is animated inline by RaffleOverlay over the locked 3s easeOutExpo roll. */
+.raffle-viewport {
+  position: relative;
+  width: min(360px, 100%);
+  height: 300px;
+  overflow: hidden;
+  border-radius: 14px;
+  background: #0c1922;
+  border: 1px solid #21404f;
+}
+
+.raffle-strip {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  will-change: transform;
+}
+
+.raffle-cell {
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #8aa6b3;
+}
+
+.raffle-band {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  top: 120px;
+  height: 60px;
+  border-radius: 10px;
+  border: 2px solid #a8f0f4;
+  box-shadow: 0 0 0 1000px rgba(8, 16, 22, 0.55);
+  pointer-events: none;
+}
+
 .raffle-winner {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 10px;
+  animation: raffle-pop 0.25s ease-out;
+}
+
+/* The winner "pops" to full size when the reel settles. Respect reduced motion. */
+@keyframes raffle-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .raffle-winner {
+    animation: none;
+  }
 }
 
 .raffle-label {

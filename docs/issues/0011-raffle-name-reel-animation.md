@@ -16,15 +16,31 @@ prototype's locked motion parameters/structure feed this slice's handoff.
 
 ## Acceptance criteria
 
-- [ ] A `/prototype` of the reel motion is built and its **feel approved** before implementation.
-- [ ] The reel cycles the **actual Lead names**, decelerates, and lands on the winner, which pops to full size.
-- [ ] The revealed winner is **always the `rng`-chosen one** (the animation never determines the winner) —
+- [x] A `/prototype` of the reel motion is built and its **feel approved** before implementation.
+- [x] The reel cycles the **actual Lead names**, decelerates, and lands on the winner, which pops to full size.
+- [x] The revealed winner is **always the `rng`-chosen one** (the animation never determines the winner) —
       asserted via an injected `rng`.
-- [ ] **Draw again** replays the roll to the next chosen winner; **Done** returns to Home; Leads remain unchanged.
-- [ ] `prefers-reduced-motion` falls back to an instant reveal (no jarring motion for users who opted out).
-- [ ] Durable tests assert the **outcome** (the chosen winner is revealed) via the injected `rng`; the **motion
+- [x] **Draw again** replays the roll to the next chosen winner; **Done** returns to Home; Leads remain unchanged.
+- [x] `prefers-reduced-motion` falls back to an instant reveal (no jarring motion for users who opted out).
+- [x] Durable tests assert the **outcome** (the chosen winner is revealed) via the injected `rng`; the **motion
       itself is QA'd live** (Playwright MCP) + via the prototype, not unit-asserted.
-- [ ] `npm test` all green, `tsc -b` + `npm run lint` clean.
+- [x] `npm test` all green, `tsc -b` + `npm run lint` clean.
+
+## Implementation notes (Slice 11)
+
+- **`/prototype`** built as a throwaway mock (`/tmp/raffle-reel-prototype.html`) with live tuners; the Vendor
+  locked **Duration 3.0s · 8 loops · easeOutExpo `cubic-bezier(.16,1,.3,1)`**, baked into `RaffleOverlay` as
+  named constants.
+- **Pick-then-animate (fairness):** `makeSpin` calls `pickWinner(leads, random)` **first**; the revealed card
+  shows `spin.winner` **directly**, so the reel's `landTranslate` only positions pixels — the animation can
+  never change the winner. The reveal fires after `RAFFLE_DURATION_MS` via a **timer** (not `transitionend`, so
+  jsdom can test it). `prefers-reduced-motion` (injectable `prefersReducedMotion`, default `matchMedia`) → instant
+  reveal, no reel.
+- **Verified:** built by a subagent via TDD (+5 reel tests; the two Slice-10 App tests migrated to advance fake
+  timers and still assert the chosen winner). **Independently/adversarially inspected**: re-ran (114 green),
+  re-read the code (confirmed the winner is `pickWinner`'s result, displayed directly — the animation cannot
+  disagree). **Live Playwright QA**: the reel rolls and hides the winner mid-roll, pops a real winner after ~3s,
+  Draw again replays to a new winner, reduced-motion reveals instantly with no reel, Leads unchanged.
 
 ## Blocked by
 

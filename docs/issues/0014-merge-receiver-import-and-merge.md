@@ -50,6 +50,11 @@ de-duplicated list, and a summary shows **"Imported N new Leads (P already had).
 > the **real-second-phone QA**, test scannability across realistic list sizes and **tune `DEFAULT_CHUNK_SIZE`
 > (in `src/lib/listTransfer.ts`) and/or the sender's QR render size** until codes scan reliably end-to-end. Do
 > NOT finalize a chunk size from headless jsQR alone — measure on real cameras.
+>
+> **Decision (Vendor):** target **8–10 Leads per chunk** AND **maximize the QR render size** for the viewing
+> screen (render the sender's codes larger than the 320px badge QR — as large as comfortably fits, so a scanning
+> phone has plenty of pixels per module). Confirm both scan reliably on **real phones** during this slice's QA;
+> adjust within 8–10 if needed.
 
 ## Disciplines
 
