@@ -99,3 +99,16 @@ The loop, as a checklist you can run on your own idea:
 7. **Deploy** to a real URL.
 
 That's it. The rest of this walkthrough is what it looked like when we actually did it.
+
+---
+
+## About this build
+
+This app — and the walkthrough you just read — was built live for the **Day of Data** community (formerly
+**SQL Saturday**) as a free, hands-on lesson for the community: not a throwaway demo, but a real app shipped
+through a disciplined loop you can repeat on your own work. The point isn't this app — it's the *method*, and
+what you walk away able to build yourself.
+
+The session was coached by **[Obney.ai](https://obney.ai)** — led by **Daryl Roberts**, Head of AI at Obney —
+the human staying the architect while the AI did the typing. A small thank-you to the Day of Data team and
+everyone who showed up to build.

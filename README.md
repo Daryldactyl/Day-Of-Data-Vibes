@@ -100,3 +100,7 @@ Controls: **← / →** move both windows · **N** toggles the in-deck notes ove
 - It's a **web app you open at a URL** — not an app-store app.
 - On **iPhone the camera only works in the Safari tab**, so we keep it URL-first (not an installed app).
 - The **Scan / leads list / Export** features get built **live** at the meetup — the home screen is intentionally bare to start.
+
+---
+
+*Built live for the **Day of Data** community (formerly **SQL Saturday**) as a free, hands-on lesson in reliable vibe coding — coached by [Obney.ai](https://obney.ai), led by Daryl Roberts, Head of AI at Obney.*
